@@ -30,6 +30,8 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const Orders = lazy(() => import('./pages/Orders'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const Favorites = lazy(() => import('./pages/Favorites'));
+const ProductList = lazy(() => import('./pages/ProductList'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 
 
 // Componente que renderiza o conteúdo principal da aplicação
@@ -78,8 +80,12 @@ function AppContent() {
             {/* ===== PÁGINAS DE AUTENTICAÇÃO ===== */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/produtos/novo" element={<ProductRegistration />} />
+            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            <Route path="/AdminDashboard/produtos/novo" element={<ProductRegistration />} />
+            
+            {/* ===== PÁGINAS DE PRODUTOS ===== */}
+            <Route path="/produtos" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><ProductList /></motion.div>} />
+            <Route path="/produto/:id" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><ProductDetail /></motion.div>} />
             
             {/* ===== PÁGINAS DE USUÁRIO ===== */}
             <Route path="/profile" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><Profile /></motion.div>} />

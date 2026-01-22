@@ -1,5 +1,5 @@
 {
-  "apps": [
+  "apps"; [
     {
       "name": "ecommerce-backend",
       "script": "./server.js",
