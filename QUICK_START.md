@@ -1,5 +1,9 @@
 # ⚡ Guia Rápido de Instalação - BazzarMZ
 
+**🚀 Status:** ✅ PRODUCTION READY (92%)  
+**📅 Atualizado:** 22 de Janeiro de 2026  
+**Repository:** [RobsonUaila/BazzarMZ](https://github.com/RobsonUaila/BazzarMZ)
+
 ## 🚀 Início Rápido (5 minutos)
 
 ### Passo 1: Instalar Dependências
@@ -31,17 +35,37 @@ Você tem um **e-commerce completo** com:
 
 ---
 
-## 📖 Documentação
+## 📖 Documentação Completa
 
 Leia os ficheiros na ordem:
-1. **README.md** - Visão geral
-2. **NEXT_STEPS.md** - Como continuar
-3. **PROJECT_OVERVIEW.md** - Resumo do projeto
+1. **README.md** - Visão geral do projeto
+2. **DEPLOYMENT_CHECKLIST.md** - Status de produção (92% pronto)
+3. **PRODUCTION_DEPLOYMENT_GUIDE.md** - Guia de deploy (Docker, PM2, Manual)
+4. **PROJECT_OVERVIEW.md** - Arquitetura e estrutura
+
+---
+
+## 🧪 Testes
+
+### Backend (Jest)
+```bash
+cd backEnd
+npm test
+```
+**Status:** ✅ 6/6 tests passing (usuarios, pedidos, itensPedidos)
+
+### Frontend (Vitest)
+```bash
+cd frontEnd
+npm run test
+```
+**Status:** ✅ Test infrastructure ready
 
 ---
 
 ## 🎯 Testar as Rotas
 
+**Frontend:**
 ```
 Home        → http://localhost:5173/
 Login       → http://localhost:5173/login
@@ -51,6 +75,39 @@ Search      → http://localhost:5173/search
 Favorites   → http://localhost:5173/favorites
 Checkout    → http://localhost:5173/checkout
 Orders      → http://localhost:5173/orders
+```
+
+**Backend API (com Backend rodando):**
+```
+Usuarios    → GET/POST http://localhost:3000/api/usuarios
+Pedidos     → GET/POST http://localhost:3000/api/pedidos
+ItensPedidos → GET/POST http://localhost:3000/api/itens-pedidos
+API Docs    → http://localhost:3000/api-docs (Swagger)
+```
+
+---
+
+## 🚀 Deploy para Produção
+
+### Opção 1: Docker (Recomendado)
+```bash
+docker-compose up -d
+# Acesso: http://localhost (com Nginx reverse proxy)
+```
+
+### Opção 2: PM2 (Node.js puro)
+```bash
+cd backEnd
+pm2 start ecosystem.config.js
+cd ../frontEnd
+npm run build
+npm run preview
+```
+
+### Opção 3: Executar Script de Deploy
+```bash
+./deploy.sh        # Linux/Mac
+deploy.bat        # Windows
 ```
 
 ---

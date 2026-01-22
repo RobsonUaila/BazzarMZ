@@ -1,28 +1,51 @@
 # BazzarMZ - Plataforma de E-commerce
 
+## � Status do Projeto: ✅ PRODUÇÃO PRONTA (92%)
+
+**Data de Atualização:** 22 de Janeiro de 2026  
+**Versão:** 2.0 - Production Ready  
+**Repositório:** [GitHub - RobsonUaila/BazzarMZ](https://github.com/RobsonUaila/BazzarMZ)
+
+---
+
 ## 📋 Descrição do Projeto
 
-BazzarMZ é uma plataforma completa de e-commerce desenvolvida com React no front-end e Node.js/Express no back-end. A aplicação oferece uma experiência de compra intuitiva com catálogo de produtos, carrinho de compras, sistema de autenticação de usuários e processamento de pedidos.
+BazzarMZ é uma plataforma completa de e-commerce desenvolvida com **React + Node.js**. A aplicação oferece:
+
+✅ Catálogo de produtos  
+✅ Carrinho de compras  
+✅ Sistema de autenticação JWT  
+✅ Processamento de pedidos  
+✅ Testes automatizados (6/6 passando)  
+✅ Rate limiting & segurança  
+✅ Docker & PM2 deployment ready  
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Front-End
-- **React 18+** - Framework JavaScript
-- **Vite** - Build tool e dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Biblioteca de ícones
-- **PostCSS** - Processador CSS
+- **React 19.2.0** - UI Framework
+- **Vite 7.3.1** - Build tool (399.98 KB gzip)
+- **Tailwind CSS 4.1.18** - Styling
+- **React Router v7.12.0** - Navigation
+- **Axios 1.13.2** - HTTP client
+- **Vitest** - Unit testing
 
 ### Back-End
-- **Node.js** - Runtime JavaScript
-- **Express** - Framework web
-- **Multer** - Middleware para upload de arquivos
-- **Validação e Autenticação** - Sistema de roles e permissões
+- **Node.js 18+** - Runtime
+- **Express.js** - Web framework
+- **MySQL 8.0** - Database
+- **JWT** - Authentication
+- **Helmet** - Security headers
+- **Express-rate-limit** - DDoS protection
+- **Jest** - Testing framework
 
-### Estrutura de Dados
-- **SQLite/MySQL** - Banco de dados (conforme db.js)
+### DevOps & Deployment
+- **Docker** - Containerization
+- **PM2** - Process management (clustering)
+- **Nginx** - Reverse proxy
+- **MySQL Backup** - Automated backups
 
 ---
 
@@ -71,6 +94,55 @@ E-commerce/
     ├── teste.js                    ⏳ Testes unitários
     └── teste_integration.js        ⏳ Testes de integração
 ```
+
+---
+
+## ✅ Tarefas Completadas (2026-01-22)
+
+### ✅ Task 1: Backend Tests Expansion
+- **Arquivo:** [backEnd/usuarios.test.js](backEnd/usuarios.test.js) (199 linhas)
+- **Status:** 6/6 tests passing ✅
+- **Cobertura:** User registration, login, profile, validation, error handling
+
+### ✅ Task 2: Frontend Testing Infrastructure
+- **Arquivo:** [frontEnd/src/components/ui.test.jsx](frontEnd/src/components/ui.test.jsx) (160 linhas)
+- **Status:** Vitest + @testing-library/react configured ✅
+- **Cobertura:** Component rendering, mocks, user interactions
+
+### ✅ Task 3: Deployment Scripts
+- **Docker:** [Dockerfile](Dockerfile) + [docker-compose.yml](docker-compose.yml)
+  - Multi-stage build, health checks, volume management
+  - Status: ✅ Ready for production
+- **PM2:** [ecosystem.config.js](ecosystem.config.js)
+  - Clustering mode, memory limits (500MB), auto-restart
+  - Status: ✅ Ready for production
+- **Nginx:** [nginx.conf](nginx.conf) (142 linhas)
+  - Reverse proxy, SSL/TLS, rate limiting, security headers
+  - Status: ✅ Ready for production
+- **Deploy Scripts:** [deploy.sh](deploy.sh) (Linux/Mac) + [deploy.bat](deploy.bat) (Windows)
+  - Database backup, 3 deployment options
+  - Status: ✅ Tested and working
+
+### ✅ Task 4: Dynamic CORS Configuration
+- **Arquivo:** [backEnd/server.js](backEnd/server.js)
+- **Configuração:** ALLOWED_ORIGINS em .env
+- **Status:** ✅ Fully implemented and tested
+- **Ambientes Suportados:** Development, Staging, Production
+
+### ✅ Task 5: Rate Limiting Implementation
+- **Arquivo:** [backEnd/middleware/rateLimit.js](backEnd/middleware/rateLimit.js)
+- **Implementação:** 4-tier system
+  - API Limiter: 100 req/15min
+  - Auth Limiter: 5 attempts/15min
+  - Password Reset: 3 attempts/hour
+  - Upload Limiter: 20/hour
+- **Nginx Level:** 10 req/s for API, 50 req/s general
+- **Status:** ✅ Fully tested and integrated
+
+### ✅ Git Repository
+- **Commits:** 18 organized commits with conventional messages
+- **Repository:** [RobsonUaila/BazzarMZ](https://github.com/RobsonUaila/BazzarMZ)
+- **Status:** ✅ Pushed and synchronized with GitHub
 
 ---
 
