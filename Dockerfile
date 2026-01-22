@@ -1,21 +1,21 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Copy backend
 COPY backEnd ./backEnd
 WORKDIR /app/backEnd
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Copy frontend
 WORKDIR /app
 COPY frontEnd ./frontEnd
 WORKDIR /app/frontEnd
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 

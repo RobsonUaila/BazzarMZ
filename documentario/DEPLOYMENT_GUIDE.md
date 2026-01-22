@@ -208,21 +208,32 @@ serve -s dist -l 8080
 
 ### 5️⃣ Configurar CORS para Produção
 
-No `backEnd/server.js`, atualize CORS:
+O backend já está configurado para aceitar origens dinâmicas.
+No seu arquivo `.env` (ou variáveis do Railway), configure:
 
-```javascript
-// Antes
-app.use(cors());
-
-// Depois
-const corsOptions = {
-  origin: ['https://seu-dominio.com', 'https://www.seu-dominio.com'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
-app.use(cors(corsOptions));
+```env
+ALLOWED_ORIGINS=https://seu-dominio.com,https://www.seu-dominio.com
 ```
+
+### 6️⃣ Configuração Avançada de Produção
+
+**Gerar JWT Secret Seguro:**
+Execute o script utilitário para gerar uma chave forte:
+```bash
+node backEnd/generate-secret.js
+```
+Copie a chave gerada para a variável `JWT_SECRET` no seu ambiente de produção.
+
+**Configurar Monitoramento (Sentry):**
+O backend já possui integração com Sentry. Para ativar:
+1. Crie um projeto no Sentry.io e obtenha o DSN.
+2. Adicione a variável de ambiente: `SENTRY_DSN=sua_url_dsn`
+
+**Backup do Banco de Dados:**
+Para realizar backups manuais: `node backEnd/middleware/backup.js`
+
+**SSL/HTTPS:**
+O servidor força HTTPS automaticamente em produção. Certifique-se de que seu provedor (Railway/Nginx) encaminha o tráfego na porta correta.
 
 ---
 

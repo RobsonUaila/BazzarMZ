@@ -1,19 +1,10 @@
 #!/bin/bash
 
-echo "🔧 Configurando ambiente Railway..."
+echo "🧹 Limpando configurações conflitantes do Railway..."
 
-# 1. Criar .npmrc para garantir instalação de todas as dependências
-echo "production=false" > .npmrc
-echo "✅ .npmrc criado (força instalação de devDependencies)"
+# Remover arquivos que forçam o uso do Nixpacks
+rm -f nixpacks.toml .npmrc
+rm -f ../nixpacks.toml ../.npmrc
 
-# 2. Criar configuração do Nixpacks
-cat > nixpacks.toml << 'EOF'
-[phases.setup]
-nixPkgs = ["nodejs_20"]
-
-[phases.install]
-cmds = ["npm install"]
-EOF
-echo "✅ nixpacks.toml criado"
-
-echo "🚀 Setup concluído! Execute: git add . && git commit -m 'chore: railway setup' && git push"
+echo "✅ Arquivos de configuração Nixpacks removidos."
+echo "🚀 Agora o Railway usará o Dockerfile da raiz. Execute: git add . && git commit -m 'chore: cleanup railway config' && git push"

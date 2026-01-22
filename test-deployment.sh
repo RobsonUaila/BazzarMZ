@@ -2,159 +2,158 @@
 
 # SCRIPT DE TESTE PRÉ-DEPLOYMENT
 # E-commerce - 21 de Janeiro de 2026
+# Para Linux/Mac/Git Bash
 
-echo "======================================"
-echo "   INICIANDO TESTES PRÉ-DEPLOYMENT"
-echo "======================================"
+echo -e "\033[0;36m======================================\033[0m"
+echo -e "\033[0;36m   INICIANDO TESTES PRÉ-DEPLOYMENT\033[0m"
+echo -e "\033[0;36m======================================\033[0m"
 echo ""
-
-# Cores para output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
 
 PASS_COUNT=0
 FAIL_COUNT=0
 
-# Função para imprimir resultado
 print_test() {
-    if [ $1 -eq 0 ]; then
-        echo -e "${GREEN}✓ PASSOU: $2${NC}"
+    local result=$1
+    local message=$2
+    
+    if [ "$result" -eq 0 ]; then
+        echo -e "\033[0;32m✓ PASSOU: $message\033[0m"
         ((PASS_COUNT++))
     else
-        echo -e "${RED}✗ FALHOU: $2${NC}"
+        echo -e "\033[0;31m✗ FALHOU: $message\033[0m"
         ((FAIL_COUNT++))
     fi
 }
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 1️⃣  TESTES DO BACKEND"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "\033[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\033[0;36m 1️⃣  TESTES DO BACKEND\033[0m"
+echo -e "\033[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo ""
 
-cd backEnd || { echo "Erro: Não consegui entrar em backEnd"; exit 1; }
+cd backEnd || exit
 
-# Teste 1: Verificar se node_modules existe
-[ -d "node_modules" ]
-print_test $? "Dependências do backend instaladas (node_modules)"
+# Teste 1: node_modules existe
+if [ -d "node_modules" ]; then res=0; else res=1; fi
+print_test $res "Dependências do backend instaladas (node_modules)"
 
-# Teste 2: Verificar se arquivo .env existe
-[ -f ".env" ]
-print_test $? "Arquivo .env configurado"
+# Teste 2: .env existe
+if [ -f ".env" ]; then res=0; else res=1; fi
+print_test $res "Arquivo .env configurado"
 
-# Teste 3: Verificar se Jest está instalado
-grep -q "jest" package.json
-print_test $? "Jest configurado para testes"
+# Teste 3: Jest está no package.json
+if grep -q '"jest"' package.json; then res=0; else res=1; fi
+print_test $res "Jest configurado para testes"
 
-# Teste 4: Verificar se arquivo db.js existe
-[ -f "db.js" ]
-print_test $? "Arquivo de conexão do banco (db.js) existe"
+# Teste 4: db.js existe
+if [ -f "db.js" ]; then res=0; else res=1; fi
+print_test $res "Arquivo de conexão do banco (db.js) existe"
 
-# Teste 5: Verificar se arquivo server.js existe
-[ -f "server.js" ]
-print_test $? "Arquivo servidor (server.js) existe"
+# Teste 5: server.js existe
+if [ -f "server.js" ]; then res=0; else res=1; fi
+print_test $res "Arquivo servidor (server.js) existe"
 
-# Teste 6: Verificar se rotas estão configuradas
-[ -d "routes" ] && [ -f "routes/usuarios.js" ] && [ -f "routes/pedidos.js" ]
-print_test $? "Rotas API configuradas"
+# Teste 6: Rotas configuradas
+if [ -d "routes" ] && [ -f "routes/usuarios.js" ] && [ -f "routes/pedidos.js" ]; then res=0; else res=1; fi
+print_test $res "Rotas API configuradas"
 
-# Teste 7: Verificar se controllers existem
-[ -d "controllers" ] && [ -f "controllers/usuariosController.js" ]
-print_test $? "Controllers implementados"
+# Teste 7: Controllers existem
+if [ -d "controllers" ] && [ -f "controllers/usuariosController.js" ]; then res=0; else res=1; fi
+print_test $res "Controllers implementados"
 
-# Teste 8: Verificar se middlewares existem
-[ -d "middleware" ] && [ -f "middleware/error.js" ] && [ -f "middleware/auth.js" ]
-print_test $? "Middlewares de segurança configurados"
+# Teste 8: Middlewares existem
+if [ -d "middleware" ] && [ -f "middleware/error.js" ] && [ -f "middleware/auth.js" ]; then res=0; else res=1; fi
+print_test $res "Middlewares de segurança configurados"
 
-# Teste 9: Verificar se validators existem
-[ -d "validators" ] && [ -f "validators/usuarioValidator.js" ]
-print_test $? "Validadores Joi implementados"
-
-echo ""
-
-cd .. || { echo "Erro ao voltar"; exit 1; }
+# Teste 9: Validators existem
+if [ -d "validators" ] && [ -f "validators/usuarioValidator.js" ]; then res=0; else res=1; fi
+print_test $res "Validadores Joi implementados"
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 2️⃣  TESTES DO FRONTEND"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-
-cd frontEnd || { echo "Erro: Não consegui entrar em frontEnd"; exit 1; }
-
-# Teste 10: Verificar se node_modules existe
-[ -d "node_modules" ]
-print_test $? "Dependências do frontend instaladas"
-
-# Teste 11: Verificar se .env.example foi criado
-[ -f ".env.example" ]
-print_test $? "Arquivo .env.example para configuração criado"
-
-# Teste 12: Verificar se vite.config.js existe
-[ -f "vite.config.js" ]
-print_test $? "Vite configurado para build"
-
-# Teste 13: Verificar se React está instalado
-grep -q "react" package.json
-print_test $? "React instalado"
-
-# Teste 14: Verificar se Tailwind CSS está instalado
-grep -q "tailwindcss" package.json
-print_test $? "Tailwind CSS configurado"
-
-# Teste 15: Verificar se ESLint está configurado
-grep -q "eslint" package.json
-print_test $? "ESLint configurado para linting"
-
-# Teste 16: Verificar se arquivo App.jsx existe
-[ -f "src/App.jsx" ]
-print_test $? "Arquivo App.jsx existe"
-
-# Teste 17: Verificar se rotas estão configuradas
-[ -d "src/pages" ] && [ -f "src/pages/Login.jsx" ] && [ -f "src/pages/Checkout.jsx" ]
-print_test $? "Páginas React implementadas"
-
-# Teste 18: Verificar se serviço de API foi corrigido
-grep -q "VITE_API_URL" src/services/api.js
-print_test $? "URL da API usando variável de ambiente (ISSUE CORRIGIDO)"
-
-# Teste 19: Verificar se arquivo toast.js existe (renomeado)
-[ -f "src/utils/toast.js" ]
-print_test $? "Arquivo toast.js renomeado corretamente (ISSUE CORRIGIDO)"
-
-# Teste 20: Verificar se arquivo antigo toast,.js foi removido
-[ ! -f "src/utils/toast,.js" ]
-print_test $? "Arquivo inválido toast,.js removido (ISSUE CORRIGIDO)"
+cd ..
 
 echo ""
+echo -e "\033[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\033[0;36m 2️⃣  TESTES DO FRONTEND\033[0m"
+echo -e "\033[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo ""
 
-cd .. || { echo "Erro ao voltar"; exit 1; }
+cd frontEnd || exit
+
+# Teste 10: node_modules existe
+if [ -d "node_modules" ]; then res=0; else res=1; fi
+print_test $res "Dependências do frontend instaladas"
+
+# Teste 11: .env.example foi criado
+if [ -f ".env.example" ]; then res=0; else res=1; fi
+print_test $res "Arquivo .env.example para configuração criado"
+
+# Teste 12: vite.config.js existe
+if [ -f "vite.config.js" ]; then res=0; else res=1; fi
+print_test $res "Vite configurado para build"
+
+# Teste 13: React está no package.json
+if grep -q '"react"' package.json; then res=0; else res=1; fi
+print_test $res "React instalado"
+
+# Teste 14: Tailwind está no package.json
+if grep -q '"tailwindcss"' package.json; then res=0; else res=1; fi
+print_test $res "Tailwind CSS configurado"
+
+# Teste 15: ESLint está no package.json
+if grep -q '"eslint"' package.json; then res=0; else res=1; fi
+print_test $res "ESLint configurado para linting"
+
+# Teste 16: App.jsx existe
+if [ -f "src/App.jsx" ]; then res=0; else res=1; fi
+print_test $res "Arquivo App.jsx existe"
+
+# Teste 17: Páginas React existem
+if [ -d "src/pages" ] && [ -f "src/pages/Login.jsx" ] && [ -f "src/pages/Checkout.jsx" ]; then res=0; else res=1; fi
+print_test $res "Páginas React implementadas"
+
+# Teste 18: URL API usando variável de ambiente
+if grep -q "VITE_API_URL" src/services/api.js; then res=0; else res=1; fi
+print_test $res "URL da API usando variável de ambiente (ISSUE CORRIGIDO)"
+
+# Teste 19: toast.js existe
+if [ -f "src/utils/toast.js" ]; then res=0; else res=1; fi
+print_test $res "Arquivo toast.js renomeado corretamente (ISSUE CORRIGIDO)"
+
+# Teste 20: toast,.js foi removido
+if [ ! -f "src/utils/toast,.js" ]; then res=0; else res=1; fi
+print_test $res "Arquivo inválido toast,.js removido (ISSUE CORRIGIDO)"
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 📊 RESULTADOS FINAIS"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cd ..
+
 echo ""
-echo -e "${GREEN}✓ Testes passados: $PASS_COUNT${NC}"
-echo -e "${RED}✗ Testes falhados: $FAIL_COUNT${NC}"
+echo -e "\033[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\033[0;36m 📊 RESULTADOS FINAIS\033[0m"
+echo -e "\033[0;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo ""
+echo -e "\033[0;32m✓ Testes passados: $PASS_COUNT\033[0m"
+echo -e "\033[0;31m✗ Testes falhados: $FAIL_COUNT\033[0m"
 echo ""
 
 TOTAL=$((PASS_COUNT + FAIL_COUNT))
-PERCENTAGE=$((PASS_COUNT * 100 / TOTAL))
+if [ $TOTAL -gt 0 ]; then
+    PERCENTAGE=$((PASS_COUNT * 100 / TOTAL))
+else
+    PERCENTAGE=0
+fi
 
-echo "Percentual de sucesso: ${PERCENTAGE}%"
+echo -e "\033[0;33mPercentual de sucesso: ${PERCENTAGE}%\033[0m"
 echo ""
 
 if [ $FAIL_COUNT -eq 0 ]; then
-    echo -e "${GREEN}════════════════════════════════════════${NC}"
-    echo -e "${GREEN}  ✓ TODOS OS TESTES PASSARAM!${NC}"
-    echo -e "${GREEN}════════════════════════════════════════${NC}"
+    echo -e "\033[0;32m════════════════════════════════════════\033[0m"
+    echo -e "\033[0;32m  ✓ TODOS OS TESTES PASSARAM!\033[0m"
+    echo -e "\033[0;32m════════════════════════════════════════\033[0m"
     exit 0
 else
-    echo -e "${RED}════════════════════════════════════════${NC}"
-    echo -e "${RED}  ✗ ALGUNS TESTES FALHARAM${NC}"
-    echo -e "${RED}════════════════════════════════════════${NC}"
+    echo -e "\033[0;31m════════════════════════════════════════\033[0m"
+    echo -e "\033[0;31m  ✗ ALGUNS TESTES FALHARAM\033[0m"
+    echo -e "\033[0;31m════════════════════════════════════════\033[0m"
     exit 1
 fi
