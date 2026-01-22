@@ -57,6 +57,8 @@ const usuariosRouter = require('./routes/usuarios');
 const pedidosRouter = require('./routes/pedidos');
 const itensRouter = require('./routes/itensPedidos');
 const uploadsRouter = require('./routes/uploads');
+const reviewsRouter = require('./routes/reviews');
+const wishlistRouter = require('./routes/wishlist');
 const ErrorResponse = require('./utils/ErrorResponse');
 const errorHandler = require('./middleware/error');
 
@@ -86,6 +88,8 @@ app.use('/usuarios', usuariosRouter);
 app.use('/pedidos', pedidosRouter);
 app.use('/itens-pedidos', itensRouter);
 app.use('/upload', uploadsRouter);
+app.use('/api/reviews', reviewsRouter);
+app.use('/api/wishlist', wishlistRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Health check endpoint (not rate limited)
