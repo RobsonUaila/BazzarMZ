@@ -1,15 +1,10 @@
-import { useState } from 'react';
-import {  X,  Heart} from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 
 function Intro() { 
-     const [cart, setCart] = useState([]);
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-
-
+    const navigate = useNavigate();
     const products = [
     {
       id: 1,
@@ -61,16 +56,6 @@ function Intro() {
     }
   ];
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
-
-  const removeFromCart = (index) => {
-    setCart(cart.filter((_, i) => i !== index));
-  };
-
-  const totalCart = cart.reduce((sum, item) => sum + item.price, 0);
-
     return(
         <div>
             {/* Grade de Produtos */}
@@ -90,7 +75,7 @@ function Intro() {
             <div 
               key={product.id} 
               className="bg-white rounded-lg shadow-sm hover:shadow-lg transition group cursor-pointer"
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => navigate(`/produto/${product.id}`)}
             >
               <div className="relative overflow-hidden rounded-t-lg">
                 <img 
@@ -120,131 +105,15 @@ function Intro() {
                   <p className="text-2xl font-bold text-gray-900">
                   {product.price.toFixed(2)} Mts
                   </p>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(product);
-                    }}
-                    className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
-                  >
-                    Adicionar
-                  </button>
+                  <div className="text-sm text-blue-600 font-medium group-hover:underline">
+                      Ver detalhes &rarr;
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Barra Lateral do Carrinho */}
-      {cart.length > 0 && (
-        <div className="fixed bottom-0 right-0 w-full md:w-96 bg-white shadow-2xl border-t md:border-l border-gray-200 max-h-96 overflow-y-auto z-40">
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">Carrinho ({cart.length})</h3>
-              <button onClick={() => setCart([])} className="text-sm text-red-600 hover:underline">
-                Limpar
-              </button>
-            </div>
-            
-            <div className="space-y-3 mb-4">
-              {cart.map((item, index) => (
-                <div key={index} className="flex items-center gap-3 pb-3 border-b">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm">{item.name}</p>
-                    <p className="text-gray-600">{item.price.toFixed(2)} Mts</p>
-                  </div>
-                  <button 
-                    onClick={() => removeFromCart(index)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="flex justify-between mb-4">
-                <span className="font-semibold">Total:</span>
-                <span className="text-2xl font-bold"> {totalCart.toFixed(2)} MZ</span>
-              </div>
-              <button className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
-                Finalizar Compra
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal do Produto */}
-      {selectedProduct && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedProduct(null)}
-        >
-          <div 
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="grid md:grid-cols-2 gap-8 p-8">
-              <img 
-                src={selectedProduct.image} 
-                alt={selectedProduct.name}
-                className="w-full h-96 object-cover rounded-lg"
-              />
-              <div>
-                <h2 className="text-3xl font-bold mb-4">{selectedProduct.name}</h2>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        size={20} 
-                        fill={i < Math.floor(selectedProduct.rating) ? "currentColor" : "none"}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-gray-600 ml-2">({selectedProduct.reviews} avaliações)</span>
-                </div>
-                <p className="text-4xl font-bold text-gray-900 mb-6">
-                  R$ {selectedProduct.price.toFixed(2)}
-                </p>
-                <p className="text-gray-600 mb-6">
-                  Produto de alta qualidade, perfeito para o seu estilo. Disponível em várias cores e tamanhos.
-                </p>
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold mb-2">Tamanho:</label>
-                  <div className="flex gap-2">
-                    {['P', 'M', 'G', 'GG'].map(size => (
-                      <button key={size} className="border-2 border-gray-300 px-4 py-2 rounded hover:border-black">
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <button 
-                  onClick={() => {
-                    addToCart(selectedProduct);
-                    setSelectedProduct(null);
-                  }}
-                  className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition mb-4"
-                >
-                  Adicionar ao Carrinho
-                </button>
-                <button 
-                  onClick={() => setSelectedProduct(null)}
-                  className="w-full border-2 border-gray-300 py-4 rounded-lg font-semibold hover:bg-gray-50 transition"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
      </div>
     );
 

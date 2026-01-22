@@ -33,16 +33,16 @@ function Footer() {
                         <h4 className="font-bold mb-4">Ajuda</h4>
                         <ul className="space-y-2 text-gray-400">
                             <li>
-                                <a href="#" className="hover:text-white transition">FAQ</a>
+                                <Link to="/ajuda" className="hover:text-white transition">FAQ</Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-white transition">Envios</a>
+                                <Link to="/politicas" className="hover:text-white transition">Envios</Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-white transition">Devoluções</a>
+                                <Link to="/politicas" className="hover:text-white transition">Devoluções</Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-white transition">Garantia</a>
+                                <Link to="/politicas" className="hover:text-white transition">Garantia</Link>
                             </li>
                         </ul>
                     </div>
@@ -93,9 +93,9 @@ function Footer() {
 
                 {/* Links Rápidos */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 text-sm text-gray-400">
-                    <a href="#" className="hover:text-white transition">Política de Privacidade</a>
-                    <a href="#" className="hover:text-white transition">Termos de Serviço</a>
-                    <a href="#" className="hover:text-white transition">Política de Cookies</a>
+                    <Link to="/politicas" className="hover:text-white transition">Política de Privacidade</Link>
+                    <Link to="/termos" className="hover:text-white transition">Termos de Serviço</Link>
+                    <Link to="/politicas" className="hover:text-white transition">Política de Cookies</Link>
                     
                 </div>
 

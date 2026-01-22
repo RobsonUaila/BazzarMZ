@@ -25,7 +25,7 @@ function Login() {
       const response = await fetch(`${apiUrl}/api/usuarios/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, senha: password })
       });
 
       const data = await response.json();
@@ -36,13 +36,24 @@ function Login() {
 
       if (data.token) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
         toastSuccess("Login realizado com sucesso!");
-        navigate('/admin'); // Redireciona para o dashboard sem recarregar
+        
+        if (data.user && data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/');
+        }
       }
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Erro ao fazer login. Tente novamente.');
-      toastError("Email ou senha inválida");
+      const errorMessage = err.message === 'Failed to fetch' 
+        ? 'Erro de conexão: O servidor backend parece estar desligado.' 
+        : (err.message || 'Erro ao fazer login. Tente novamente.');
+      
+      setError(errorMessage);
+      toastError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -188,18 +188,22 @@ function ProductDetail() {
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-12">
-            {/* Imagem */}
-            <div className="flex flex-col gap-4">
-              <div className="bg-gray-100 rounded-lg overflow-hidden h-96 md:h-full flex items-center justify-center">
+            {/* Imagem (Criativo) - Sticky para acompanhar a descrição */}
+            <div className="flex flex-col gap-4 sticky top-24 h-fit">
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-sm border border-gray-100 aspect-square flex items-center justify-center relative group">
                 {product.imagem_capa ? (
                   <img 
                     src={product.imagem_capa} 
                     alt={product.nome}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain hover:scale-105 transition duration-500"
                   />
                 ) : (
                   <div className="text-gray-400">Sem imagem</div>
                 )}
+                {/* Badge de Zoom/Visualização */}
+                <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-600 opacity-0 group-hover:opacity-100 transition">
+                  Visualizar Criativo
+                </div>
               </div>
             </div>
 
@@ -248,7 +252,7 @@ function ProductDetail() {
                 {/* Descrição */}
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">Descrição</h2>
-                  <div className="text-gray-700 leading-relaxed prose prose-sm max-w-none">
+                  <div className="text-gray-700 leading-relaxed prose prose-blue max-w-none">
                     {product.descricao ? (
                       <div dangerouslySetInnerHTML={{ __html: product.descricao }} />
                     ) : (

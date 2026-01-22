@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import { Heart, ShoppingCart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toastError } from '../utils/toast';
 
 function ProductList() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -230,6 +231,7 @@ function ProductList() {
               {products.map(product => (
                 <div
                   key={product.id}
+                  onClick={() => navigate(`/produto/${product.id}`)}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition group"
                 >
                   {/* Imagem */}
@@ -281,25 +283,9 @@ function ProductList() {
                       </span>
                     </div>
 
-                    {/* Botões */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => addToCart(product)}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold flex items-center justify-center gap-2 transition"
-                      >
-                        <ShoppingCart size={16} />
-                        <span className="hidden sm:inline">Adicionar</span>
-                      </button>
-                      <button
-                        onClick={() => toggleFavorite(product)}
-                        className={`px-3 py-2 rounded border transition ${
-                          favorites.includes(product.id)
-                            ? 'bg-red-500 border-red-500 text-white'
-                            : 'border-gray-300 text-gray-600 hover:border-red-500'
-                        }`}
-                      >
-                        <Heart size={18} fill={favorites.includes(product.id) ? 'currentColor' : 'none'} />
-                      </button>
+                    {/* Chamada para Ação Visual */}
+                    <div className="mt-4 text-sm text-blue-600 font-medium group-hover:underline">
+                      Ver detalhes e comprar &rarr;
                     </div>
                   </div>
                 </div>

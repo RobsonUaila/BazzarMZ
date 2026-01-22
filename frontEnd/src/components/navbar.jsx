@@ -24,11 +24,11 @@ function Navbar() {
                     </div>
 
                     <nav className="hidden md:flex space-x-8">
-                        <Link to="/search" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Novidades</Link>
-                        <Link to="/search" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Cosmeticos</Link>
-                        <Link to="/search" className="text-gray-700  hover:bg-gray-500 hover:text-white rounded-full p-2">Produtos de Limpeza</Link>
-                        <Link to="/search" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Acessórios</Link>
-                        <Link to="/search" className="text-red-600 font-semibold  hover:bg-gray-500 hover:text-white rounded-full p-2">Promoções</Link>
+                        <Link to="/produtos" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Todos</Link>
+                        <Link to="/produtos" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Vestuário</Link>
+                        <Link to="/produtos" className="text-gray-700  hover:bg-gray-500 hover:text-white rounded-full p-2">Calçados</Link>
+                        <Link to="/produtos" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Acessórios</Link>
+                        <Link to="/produtos" className="text-gray-700 hover:bg-gray-500 hover:text-white rounded-full p-2">Eletrônicos</Link>
 
                     </nav>
 
@@ -58,11 +58,11 @@ function Navbar() {
             {menuOpen && (
                 <div className="md:hidden border-t border-gray-200">
                     <div className="px-4 py-3 space-y-3">
-                        <Link to="/search" className="block text-gray-700 hover:text-gray-900">Novidades</Link>
-                        <Link to="/search" className="block text-gray-700 hover:text-gray-900">Cosmeticos</Link>
-                        <Link to="/search" className="block text-gray-700 hover:text-gray-900">Produtos de Limpeza</Link>
-                        <Link to="/search" className="block text-gray-700 hover:text-gray-900">Acessórios</Link>
-                        <Link to="/search" className="block text-red-600 font-semibold">Promoções</Link>
+                        <Link to="/produtos" className="block text-gray-700 hover:text-gray-900">Todos</Link>
+                        <Link to="/produtos" className="block text-gray-700 hover:text-gray-900">Vestuário</Link>
+                        <Link to="/produtos" className="block text-gray-700 hover:text-gray-900">Calçados</Link>
+                        <Link to="/produtos" className="block text-gray-700 hover:text-gray-900">Acessórios</Link>
+                        <Link to="/produtos" className="block text-gray-700 hover:text-gray-900">Eletrônicos</Link>
                         <div className="border-t pt-3 space-y-2">
                             <Link to="/profile" className="block text-gray-700 hover:text-gray-900">Meu Perfil</Link>
                             <Link to="/favorites" className="block text-gray-700 hover:text-gray-900">Favoritos</Link>

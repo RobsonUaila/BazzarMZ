@@ -32,6 +32,7 @@ const SearchPage = lazy(() => import('./pages/SearchPage'));
 const Favorites = lazy(() => import('./pages/Favorites'));
 const ProductList = lazy(() => import('./pages/ProductList'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const PolicyPage = lazy(() => import('./pages/PolicyPage'));
 
 
 // Componente que renderiza o conteúdo principal da aplicação
@@ -59,6 +60,13 @@ function AppContent() {
     </div>
   );
 
+  // Wrapper para rotas com animação (evita repetição)
+  const AnimatedRoute = ({ children }) => (
+    <motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}>
+      {children}
+    </motion.div>
+  );
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -80,21 +88,26 @@ function AppContent() {
             {/* ===== PÁGINAS DE AUTENTICAÇÃO ===== */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/AdminDashboard" element={<AdminDashboard />} />
-            <Route path="/AdminDashboard/produtos/novo" element={<ProductRegistration />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/product-registration" element={<ProductRegistration />} />
             
             {/* ===== PÁGINAS DE PRODUTOS ===== */}
-            <Route path="/produtos" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><ProductList /></motion.div>} />
-            <Route path="/produto/:id" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><ProductDetail /></motion.div>} />
+            <Route path="/produtos" element={<AnimatedRoute><ProductList /></AnimatedRoute>} />
+            <Route path="/produto/:id" element={<AnimatedRoute><ProductDetail /></AnimatedRoute>} />
             
             {/* ===== PÁGINAS DE USUÁRIO ===== */}
-            <Route path="/profile" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><Profile /></motion.div>} />
-            <Route path="/favorites" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><Favorites /></motion.div>} />
+            <Route path="/profile" element={<AnimatedRoute><Profile /></AnimatedRoute>} />
+            <Route path="/favorites" element={<AnimatedRoute><Favorites /></AnimatedRoute>} />
 
             {/* ===== PÁGINAS DE COMPRA ===== */}
-            <Route path="/search" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><SearchPage /></motion.div>} />
-            <Route path="/checkout" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><Checkout /></motion.div>} />
-            <Route path="/orders" element={<motion.div initial="initial" animate="in" exit="exit" variants={pageVariants} transition={pageTransition}><Orders /></motion.div>} />
+            <Route path="/search" element={<AnimatedRoute><SearchPage /></AnimatedRoute>} />
+            <Route path="/checkout" element={<AnimatedRoute><Checkout /></AnimatedRoute>} />
+            <Route path="/orders" element={<AnimatedRoute><Orders /></AnimatedRoute>} />
+
+            {/* ===== PÁGINAS INFORMATIVAS ===== */}
+            <Route path="/politicas" element={<PolicyPage title="Políticas de Privacidade e Envios" />} />
+            <Route path="/termos" element={<PolicyPage title="Termos de Serviço" />} />
+            <Route path="/ajuda" element={<PolicyPage title="Central de Ajuda (FAQ)" />} />
           </Routes>
         </Suspense>
       </AnimatePresence>

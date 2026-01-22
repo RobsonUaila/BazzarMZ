@@ -1,0 +1,23 @@
+# Arquivos ignorados no Railway build
+node_modules/
+npm-debug.log
+yarn-error.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.log
+.git
+.gitignore
+README.md
+RAILWAY_DEPLOYMENT.md
+*.test.js
+teste*.js
+.vscode
+.idea
+dist/
+build/
+coverage/
+.nyc_output/
+package-lock.json
+yarn.lock

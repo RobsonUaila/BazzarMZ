@@ -43,6 +43,11 @@ exports.createUsuario = async (req, res) => {
 
 exports.loginUsuario = (req, res) => {
     const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
+    }
+
     const sql = 'SELECT * FROM usuarios WHERE email = ?';
 
     db.query(sql, [email], async (err, results) => {
@@ -73,7 +78,17 @@ exports.loginUsuario = (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.json({ message: 'Login realizado com sucesso!', token, refreshToken });
+        res.json({ 
+            message: 'Login realizado com sucesso!', 
+            token, 
+            refreshToken,
+            user: {
+                id: usuario.idusuarios,
+                nome: usuario.nome,
+                email: usuario.email,
+                role: usuario.role
+            }
+        });
     });
 };
 
