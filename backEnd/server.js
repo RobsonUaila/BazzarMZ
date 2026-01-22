@@ -2,10 +2,12 @@
 // SERVIDOR EXPRESS - E-COMMERCE API
 
 const express = require('express');
+const path = require('path');
 require('dotenv').config();
 const cors = require('cors');
 const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
+const Sentry = require('@sentry/node');
 const swaggerSpecs = require('./config/swagger');
 const { loggerMiddleware } = require('./middleware/logger');
 const { apiLimiter, authLimiter, uploadLimiter } = require('./middleware/rateLimit');
@@ -16,11 +18,40 @@ const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3000;
 
+// Sentry Initialization (Monitoramento)
+if (process.env.SENTRY_DSN) {
+    Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        integrations: [
+            // enable HTTP calls tracing
+            new Sentry.Integrations.Http({ tracing: true }),
+            // enable Express.js tracing
+            new Sentry.Integrations.Express({ app }),
+        ],
+        tracesSampleRate: 1.0,
+    });
+    // RequestHandler creates a separate execution context using domains, so that every
+    // transaction/span/breadcrumb is attached to its own Hub instance
+    app.use(Sentry.Handlers.requestHandler());
+    // TracingHandler creates a trace for every incoming request
+    app.use(Sentry.Handlers.tracingHandler());
+    console.log('✅ Monitoramento Sentry ativado');
+}
 
 // MIDDLEWARES DE SEGURANÇA E CONFIGURAÇÃO
 
 // Protege headers HTTP contra vulnerabilidades
 app.use(helmet());
+
+// Forçar HTTPS em Produção
+if (isProduction) {
+    app.use((req, res, next) => {
+        if (req.headers['x-forwarded-proto'] !== 'https' && !req.headers.host.includes('localhost')) {
+            return res.redirect(`https://${req.headers.host}${req.url}`);
+        }
+        next();
+    });
+}
 
 // Permite acesso de outros domínios (CORS para Frontend)
 // Configurado dinamicamente baseado em variáveis de ambiente
@@ -64,14 +95,6 @@ const ErrorResponse = require('./utils/ErrorResponse');
 const errorHandler = require('./middleware/error');
 
 
-// ROTA DE TESTE
-
-
-app.get('/', (req, res) => {
-    res.send('API funcionando');
-});
-
-
 // CONFIGURAR ROTAS
 
 // Apply general API rate limiting
@@ -91,6 +114,11 @@ app.use('/api/itens-pedidos', itensRouter);
 app.use('/api/upload', uploadsRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
+// Tratamento de rotas API não encontradas (antes do frontend)
+app.use('/api/*', (req, res, next) => {
+    next(new ErrorResponse('Rota de API não encontrada', 404));
+});
+
 // Health check endpoint (not rate limited)
 app.get('/health', (req, res) => {
     res.status(200).json({
@@ -107,17 +135,27 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Servir Frontend em Produção
+if (isProduction) {
+    // Serve arquivos estáticos do build do React
+    app.use(express.static(path.join(__dirname, '../frontEnd/dist')));
 
-// TRATAMENTO DE ROTAS NÃO ENCONTRADAS (404)
-
-
-app.use((req, res, next) => {
-    next(new ErrorResponse('Rota não encontrada', 404));
-});
+    // Qualquer outra rota retorna o index.html (para o React Router funcionar)
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontEnd/dist', 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('API funcionando (Modo Desenvolvimento)');
+    });
+}
 
 
 // MIDDLEWARE DE ERRO (SEMPRE POR ÚLTIMO)
 
+if (process.env.SENTRY_DSN) {
+    app.use(Sentry.Handlers.errorHandler());
+}
 
 app.use(errorHandler);
 

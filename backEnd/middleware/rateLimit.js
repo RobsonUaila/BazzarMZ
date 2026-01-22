@@ -1,60 +1,37 @@
 const rateLimit = require('express-rate-limit');
 
-// General API rate limiter
+// Limiter geral para a API (Proteção básica contra DDoS)
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per windowMs
-    message: 'Muitas requisições deste IP, por favor tente novamente depois.',
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: (req) => {
-        // Skip rate limiting for health check
-        return req.path === '/health' || req.path === '/api/health';
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100, // Limite de 100 requisições por IP por janela
+    standardHeaders: true, // Retorna info de rate limit nos headers `RateLimit-*`
+    legacyHeaders: false, // Desabilita headers `X-RateLimit-*`
+    message: {
+        status: 429,
+        message: 'Muitas requisições deste IP, por favor tente novamente em 15 minutos.'
     }
 });
 
-// Strict rate limiter for authentication endpoints
+// Limiter estrito para autenticação (Proteção contra Brute Force)
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per windowMs
-    message: 'Muitas tentativas de login, por favor tente novamente após 15 minutos.',
+    windowMs: 60 * 60 * 1000, // 1 hora
+    max: 10, // Limite de 10 tentativas de login/registro por hora por IP
     standardHeaders: true,
     legacyHeaders: false,
-    skipSuccessfulRequests: true, // Don't count successful requests
-    skipFailedRequests: false // Count failed requests
+    message: {
+        status: 429,
+        message: 'Muitas tentativas de acesso. Por segurança, tente novamente em 1 hora.'
+    }
 });
 
-// Very strict rate limiter for password reset
-const passwordResetLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 3, // 3 attempts per hour
-    message: 'Muitas tentativas de reset de senha, por favor tente novamente após 1 hora.',
-    standardHeaders: true,
-    legacyHeaders: false
-});
-
-// Moderate rate limiter for creating resources
-const createLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 10, // 10 requests per minute
-    message: 'Muitas requisições, por favor aguarde um momento.',
-    standardHeaders: true,
-    legacyHeaders: false
-});
-
-// Download/upload limiter
+// Limiter para uploads (Proteção de armazenamento e banda)
 const uploadLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 20, // 20 uploads per hour
-    message: 'Limite de uploads excedido, por favor tente novamente mais tarde.',
-    standardHeaders: true,
-    legacyHeaders: false
+    windowMs: 60 * 60 * 1000, // 1 hora
+    max: 20, // Limite de 20 uploads por hora
+    message: {
+        status: 429,
+        message: 'Limite de uploads excedido, tente novamente mais tarde.'
+    }
 });
 
-module.exports = {
-    apiLimiter,
-    authLimiter,
-    passwordResetLimiter,
-    createLimiter,
-    uploadLimiter
-};
+module.exports = { apiLimiter, authLimiter, uploadLimiter };

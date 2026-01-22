@@ -1,12 +1,5 @@
-# Nixpacks Configuration para Railway
-# https://docs.nixpacks.com/docs/configuration/
+[phases.setup]
+nixPkgs = ["nodejs_20"]
 
-[phases.build]
-cmds = ["npm run build", "npm install --production=false"]
-
-[phases.start]
-run = "npm start"
-
-[env]
-# Desabilitar production durante instalação
-NPM_PRODUCTION = "false"
+[phases.install]
+cmds = ["npm install"]
