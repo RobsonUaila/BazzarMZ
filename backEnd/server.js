@@ -115,7 +115,7 @@ app.use('/api/upload', uploadsRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Tratamento de rotas API não encontradas (antes do frontend)
-app.use('/api/*', (req, res, next) => {
+app.use(/^\/api/, (req, res, next) => {
     next(new ErrorResponse('Rota de API não encontrada', 404));
 });
 
