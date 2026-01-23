@@ -6,7 +6,7 @@ module.exports = {
     exec_mode: "cluster",
     env: {
       NODE_ENV: "production",
-      PORT: 3000
+      // PORT será herdado do ambiente (Render usa 10000 por padrão)
     }
   }]
 }

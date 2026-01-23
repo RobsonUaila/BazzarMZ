@@ -178,7 +178,7 @@ if (process.env.NODE_ENV !== 'test') {
         }
     });
 
-    // Graceful shutdown para Railway
+    // Graceful shutdown (Render/Docker)
     process.on('SIGTERM', () => {
         console.log('⏹️  SIGTERM recebido, encerrando servidor...');
         server.close(() => {

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: bazzarmz-ecommerce
+    env: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: ecommerce
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: https://bazzarmz-ecommerce.onrender.com,https://bazzarmz.shop,https://www.bazzarmz.shop

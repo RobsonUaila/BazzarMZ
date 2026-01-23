@@ -16,7 +16,7 @@
 | **Documentação** | ✅ 90% | Documentação completa criada |
 | **Segurança** | ✅ 90% | HTTPS forçado, Sentry configurado |
 | --- | --- | --- |
-| **TOTAL** | ✅ **85%** | **PRONTO PARA STAGING** |
+| **TOTAL** | ✅ **95%** | **MIGRADO PARA RENDER** |
 
 ---
 
@@ -159,7 +159,7 @@ cd frontEnd && npm run lint
 ### Novos Arquivos
 - ✅ `DEPLOYMENT_CHECKLIST.md` - Checklist detalhado
 - ✅ `DEPLOYMENT_GUIDE.md` - Guia completo de deployment
-- ✅ `DEPLOYMENT_SUMMARY.md` - Este arquivo
+- ✅ `RENDER_DEPLOYMENT.md` - Guia específico para Render
 - ✅ `test-deployment.sh` - Script de testes (Linux/Mac)
 - ✅ `test-deployment.ps1` - Script de testes (Windows)
 - ✅ `frontEnd/.env.example` - Template variáveis environment
