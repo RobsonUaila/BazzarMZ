@@ -24,7 +24,18 @@ const port = process.env.PORT || 3000;
 
 // Protege headers HTTP contra vulnerabilidades
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop"],
+            connectSrc: ["'self'", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop"],
+            imgSrc: ["'self'", "data:", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "https://res.cloudinary.com"],
+            scriptSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-eval'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-inline'"],
+            fontSrc: ["'self'", "https:", "data:"],
+            frameAncestors: ["'self'"],
+        },
+    },
 }));
 
 // Forçar HTTPS em Produção
