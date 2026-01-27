@@ -1,29 +1,22 @@
-
-// CONTEXTO DE TEMA (LIGHT/DARK MODE)
-
-import { createContext, useContext, useEffect, useState } from "react";
-
-// CRIAR CONTEXTO
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
-// PROVEDOR DE TEMA
+export const ThemerProvider = ({ children }) => {
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-export function ThemerProvider({ children }) {
-    const [theme, setTheme] = useState(() => {
-        const saved = localStorage.getItem("theme");
-        return saved || "light";
-    });
-
-    // Aplicar tema e salvar no localStorage
     useEffect(() => {
-        document.documentElement.className = theme;
-        localStorage.setItem("theme", theme);
+        const root = window.document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+        localStorage.setItem('theme', theme);
     }, [theme]);
 
-    // Alternar entre temas
     const toggleTheme = () => {
-        setTheme(theme === "light" ? "dark" : "light");
+        setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
     };
 
     return (
@@ -31,13 +24,6 @@ export function ThemerProvider({ children }) {
             {children}
         </ThemeContext.Provider>
     );
-}
+};
 
-
-// HOOK PARA USAR O CONTEXTO
-
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useTheme() {
-    return useContext(ThemeContext);
-}
+export const useTheme = () => useContext(ThemeContext);

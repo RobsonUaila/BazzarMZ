@@ -18,6 +18,14 @@ function ProductDetail() {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/300?text=Sem+Imagem';
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    return `${apiUrl}/uploads/images/${path}`;
+  };
+
   useEffect(() => {
     fetchProduct();
     checkIfFavorite();
@@ -25,17 +33,18 @@ function ProductDetail() {
 
   const fetchProduct = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${apiUrl}/api/produtos/${id}`);
-      
+
       if (!response.ok) {
         throw new Error('Produto não encontrado');
       }
-      
+
       const data = await response.json();
-      setProduct(data);
+      // Ajuste para pegar os dados dentro do wrapper { success: true, data: {...} }
+      const productData = data.data || data;
+      setProduct(productData);
       fetchReviews();
-      fetchRelatedProducts(data.categoria);
+      fetchRelatedProducts(productData.categoria);
     } catch (error) {
       console.error(error);
       toastError('Erro ao carregar produto');
@@ -47,7 +56,6 @@ function ProductDetail() {
 
   const fetchReviews = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${apiUrl}/api/produtos/${id}/reviews`);
       if (response.ok) {
         const data = await response.json();
@@ -60,11 +68,13 @@ function ProductDetail() {
 
   const fetchRelatedProducts = async (categoria) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${apiUrl}/api/produtos?categoria=${categoria}&limit=4`);
       if (response.ok) {
         const data = await response.json();
-        const filtered = (data.produtos || data).filter(p => p.id !== id);
+        // Ajuste para pegar o array dentro de data.data
+        const lista = (data.data && Array.isArray(data.data)) ? data.data : (data.produtos && Array.isArray(data.produtos) ? data.produtos : (Array.isArray(data) ? data : []));
+        // Usar String() para garantir comparação correta entre id (string url) e p.id (number)
+        const filtered = Array.isArray(lista) ? lista.filter(p => String(p.id) !== String(id)) : [];
         setRelatedProducts(filtered.slice(0, 4));
       }
     } catch (error) {
@@ -85,25 +95,47 @@ function ProductDetail() {
       imagem: product.imagem_capa || product.imagem,
       quantity
     };
-    
+
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find(item => item.id === product.id);
-    
+    const existingItem = cart.find(item => String(item.id) === String(product.id));
+
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
       cart.push(cartItem);
     }
-    
+
     localStorage.setItem('cart', JSON.stringify(cart));
     setInCart(true);
     toastSuccess('Adicionado ao carrinho!');
     setTimeout(() => setInCart(false), 2000);
   };
 
+  const handleOrderNow = () => {
+    const cartItem = {
+      id: product.id,
+      nome: product.nome,
+      preco: product.preco,
+      imagem: product.imagem_capa || product.imagem,
+      quantity
+    };
+
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingItem = cart.find(item => String(item.id) === String(product.id));
+
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.push(cartItem);
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    navigate('/checkout');
+  };
+
   const handleAddToFavorites = () => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    
+
     if (isFavorite) {
       const updated = favorites.filter(fav => fav.id != product.id);
       localStorage.setItem('favorites', JSON.stringify(updated));
@@ -131,9 +163,8 @@ function ProductDetail() {
 
     setSubmittingReview(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const token = localStorage.getItem('token');
-      
+
       const response = await fetch(`${apiUrl}/api/produtos/${id}/reviews`, {
         method: 'POST',
         headers: {
@@ -170,14 +201,14 @@ function ProductDetail() {
     return <div className="text-center py-8">Produto não encontrado</div>;
   }
 
-  const avgRating = reviews.length > 0 
+  const avgRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="grow container mx-auto px-4 py-8">
         <div className="mb-6">
           <Link to="/produtos" className="inline-flex items-center text-gray-600 hover:text-blue-600 transition">
@@ -192,8 +223,8 @@ function ProductDetail() {
             <div className="flex flex-col gap-4 sticky top-24 h-fit">
               <div className="bg-gray-50 rounded-xl overflow-hidden shadow-sm border border-gray-100 aspect-square flex items-center justify-center relative group">
                 {product.imagem_capa ? (
-                  <img 
-                    src={product.imagem_capa} 
+                  <img
+                    src={getImageUrl(product.imagem_capa)}
                     alt={product.nome}
                     className="w-full h-full object-contain hover:scale-105 transition duration-500"
                   />
@@ -237,7 +268,7 @@ function ProductDetail() {
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2 mb-2">
                     <span className="text-4xl font-bold text-green-600">
-                      MT{parseFloat(product.preco).toFixed(2)}
+                      {parseFloat(product.preco).toFixed(2)} Mts
                     </span>
                   </div>
                 </div>
@@ -285,28 +316,18 @@ function ProductDetail() {
 
                 <div className="flex gap-4">
                   <button
-                    onClick={handleAddToCart}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition"
+                    onClick={handleOrderNow}
+                    className="flex-1 bg-green-600 hover:bg-green-800 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition"
                   >
                     <ShoppingCart size={20} />
-                    Adicionar ao Carrinho
+                    Encomendar Agoraa!
                   </button>
-                  <button
-                    onClick={handleAddToFavorites}
-                    className={`px-6 py-3 rounded-lg transition font-semibold flex items-center gap-2 ${
-                      isFavorite
-                        ? 'bg-red-500 text-white'
-                        : 'border border-gray-300 text-gray-700 hover:border-red-500'
-                    }`}
-                  >
-                    <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
-                    {isFavorite ? 'Favorito' : 'Adicionar'}
-                  </button>
+  
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-700 space-y-2">
                   <p>✓ Entrega grátis em Maputo</p>
-                  <p>✓ Devolução em 30 dias</p>
+                  <p>✓ Devolução em 7 dias</p>
                   <p>✓ 100% Original</p>
                 </div>
               </div>
@@ -419,7 +440,7 @@ function ProductDetail() {
                 >
                   <div className="relative h-48 bg-gray-100 overflow-hidden">
                     <img
-                      src={relProd.imagem_capa || relProd.imagem}
+                      src={getImageUrl(relProd.imagem_capa || relProd.imagem)}
                       alt={relProd.nome}
                       className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
                     />

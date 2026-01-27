@@ -304,12 +304,10 @@ function ProductRegistration() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   >
                     <option value="">Selecione uma categoria</option>
-                    <option value="Vestuário">Vestuário</option>
-                    <option value="Calçados">Calçados</option>
-                    <option value="Acessórios">Acessórios</option>
-                    <option value="Eletrônicos">Eletrônicos</option>
+                    <option value="Cosmeticos">Cosmeticos</option>
+                    <option value="Higiene e limpeza">Higiene e limpeza</option>
+                    <option value="Acessórios">Acessorios</option>
                     <option value="Casa">Casa</option>
-                    <option value="Beleza">Beleza</option>
                   </select>
                 </div>
               </div>

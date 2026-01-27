@@ -1,42 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Trash2, ShoppingCart, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 
 function Favorites() {
-  const [favorites, setFavorites] = useState([
-    {
-      id: 1,
-      name: 'Camiseta Premium',
-      price: 89.90,
-      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
-      rating: 4.5,
-      reviews: 128,
-      addedDate: '2024-01-14',
-    },
-    {
-      id: 3,
-      name: 'Tênis Esportivo',
-      price: 299.90,
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop',
-      rating: 4.9,
-      reviews: 203,
-      addedDate: '2024-01-12',
-    },
-    {
-      id: 5,
-      name: 'Relógio Elegante',
-      price: 599.90,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop',
-      rating: 4.6,
-      reviews: 145,
-      addedDate: '2024-01-10',
-    },
-  ]);
+  const [favorites, setFavorites] = useState([]);
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('favorites') || '[]');
+    setFavorites(saved);
+  }, []);
+
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/300?text=Sem+Imagem';
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    return `${apiUrl}/uploads/images/${path}`;
+  };
 
   const removeFavorite = (id) => {
-    setFavorites(favorites.filter(item => item.id !== id));
+    const updated = favorites.filter(item => item.id !== id);
+    setFavorites(updated);
+    localStorage.setItem('favorites', JSON.stringify(updated));
+  };
+
+  const clearAllFavorites = () => {
+    setFavorites([]);
+    localStorage.removeItem('favorites');
   };
 
   return (
@@ -69,9 +60,10 @@ function Favorites() {
                 {favorites.map(product => (
                   <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                     <div className="relative overflow-hidden h-64">
-                      <img
-                        src={product.image}
-                        alt={product.name}
+                      <Link to={`/produto/${product.id}`}>
+                        <img
+                        src={getImageUrl(product.imagem)}
+                        alt={product.nome}
                         className="w-full h-full object-cover hover:scale-105 transition duration-300"
                       />
                       <button
@@ -80,10 +72,11 @@ function Favorites() {
                       >
                         <Trash2 size={20} />
                       </button>
+                      </Link>
                     </div>
 
                     <div className="p-4">
-                      <h3 className="font-semibold text-lg text-gray-900 mb-2">{product.name}</h3>
+                      <h3 className="font-semibold text-lg text-gray-900 mb-2">{product.nome}</h3>
 
                       <div className="flex items-center mb-4">
                         <div className="flex text-yellow-400">
@@ -91,22 +84,18 @@ function Favorites() {
                             <Star
                               key={i}
                               size={16}
-                              fill={i < Math.floor(product.rating) ? 'currentColor' : 'none'}
+                              className={i < (product.rating || 4) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
                             />
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600 ml-2">({product.reviews})</span>
+                        <span className="text-sm text-gray-600 ml-2">({product.reviews_count || 0})</span>
                       </div>
-
-                      <p className="text-gray-600 text-sm mb-4">
-                        Adicionado em {new Date(product.addedDate).toLocaleDateString('pt-BR')}
-                      </p>
 
                       <div className="flex items-center justify-between gap-2">
                         <div>
                           <p className="text-sm text-gray-600">Preço</p>
                           <p className="text-2xl font-bold text-gray-900">
-                            R$ {product.price.toFixed(2)}
+                            Mts {parseFloat(product.preco).toFixed(2)}
                           </p>
                         </div>
                         <button className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
@@ -129,9 +118,7 @@ function Favorites() {
                   </button>
                   <button
                     onClick={() => {
-                      if (window.confirm('Deseja remover todos os favoritos?')) {
-                        setFavorites([]);
-                      }
+                      if (window.confirm('Deseja remover todos os favoritos?')) clearAllFavorites();
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                   >

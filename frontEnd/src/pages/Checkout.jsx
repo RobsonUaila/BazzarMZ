@@ -1,15 +1,24 @@
-import { useState } from 'react';
-import { ShoppingCart, MapPin, Truck, AlertCircle, CheckCircle2, Phone, MapPinIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingCart, MapPin, Truck, AlertCircle, CheckCircle2, Phone, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 
 function Checkout() {
-  const [cartItems] = useState([
-    { id: 1, name: 'Camiseta Premium', price: 89.90, quantity: 1, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100&h=100&fit=crop' },
-    { id: 3, name: 'Tênis Esportivo', price: 299.90, quantity: 1, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop' },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartItems(savedCart);
+  }, []);
+
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/100?text=Sem+Imagem';
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    return `${apiUrl}/uploads/images/${path}`;
+  };
+  
   const [formData, setFormData] = useState({
     Nome_do_Cliente: '',
     numero_chamadas: '',
@@ -20,9 +29,15 @@ function Checkout() {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = subtotal > 100 ? 0 : 15;
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.preco * item.quantity), 0);
+  const shipping = 0; // Entrega sempre grátis
   const total = subtotal + shipping;
+
+  const removeItem = (indexToRemove) => {
+    const newCart = cartItems.filter((_, index) => index !== indexToRemove);
+    setCartItems(newCart);
+    localStorage.setItem('cart', JSON.stringify(newCart));
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -74,10 +89,13 @@ function Checkout() {
 
     // Construir mensagem para WhatsApp
     const produtosLista = cartItems
-      .map(item => `- ${item.name} (Qtd: ${item.quantity}) -  ${(item.price * item.quantity).toFixed(2)} Mts`)
+      .map(item => `- ${item.nome} (Qtd: ${item.quantity}) -  ${(item.preco * item.quantity).toFixed(2)} Mts`)
       .join('\n');
 
     const mensagem = `*🛍️ NOVO PEDIDO*
+
+*Nome do Cliente:*
+${formData.Nome_do_Cliente}
 
 *Número de Chamadas:*
 ${formData.numero_chamadas}
@@ -289,16 +307,21 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                 </h2>
 
                 <div className="space-y-3 mb-4 max-h-64 overflow-y-auto border-b pb-4">
-                  {cartItems.map(item => (
-                    <div key={item.id} className="flex justify-between items-center text-sm">
-                      <div className="flex gap-2 flex-1">
-                        <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                  {cartItems.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm group">
+                      <div className="flex gap-2 flex-1 min-w-0">
+                        <img src={getImageUrl(item.imagem)} alt={item.nome} className="w-12 h-12 object-cover rounded" />
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{item.name}</p>
-                          <p className="text-gray-600 text-xs">Qtd: {item.quantity}</p>
+                          <p className="font-semibold text-gray-900 truncate">{item.nome}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-gray-600 text-xs">Qtd: {item.quantity}</p>
+                            <button onClick={() => removeItem(index)} className="text-red-400 hover:text-red-600 transition" title="Remover item">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <p className="font-semibold text-gray-900"> {(item.price * item.quantity).toFixed(2)} Mts</p>
+                      <p className="font-semibold text-gray-900"> {(item.preco * item.quantity).toFixed(2)} Mts</p>
                     </div>
                   ))}
                 </div>
@@ -309,7 +332,7 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                     <span className="font-semibold"> {subtotal.toFixed(2)} Mts</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Entrerga:</span>
+                    <span className="text-gray-600">Entrega:</span>
                     <span className={`font-semibold ${shipping === 0 ? 'text-green-600' : ''}`}>
                       {shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                     </span>
@@ -328,12 +351,10 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                   <p>Você pagará em dinheiro ao receber o produto</p>
                 </div>
 
-                {subtotal > 100 && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800 mt-3">
-                    <p className="font-semibold mb-1">🎉 Entrega Grátis!</p>
-                    <p>Sua compra qualifica para entregas grátis</p>
-                  </div>
-                )}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800 mt-3">
+                  <p className="font-semibold mb-1">🎉 Entrega Grátis!</p>
+                  <p>Aproveite a nossa entrega gratuita para todos os pedidos.</p>
+                </div>
               </div>
             </div>
           </div>

@@ -1,7 +1,17 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
 
 function Footer() {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
+
     return (
         <footer className="bg-gray-900 text-white mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -36,13 +46,13 @@ function Footer() {
                                 <Link to="/ajuda" className="hover:text-white transition">FAQ</Link>
                             </li>
                             <li>
-                                <Link to="/politicas" className="hover:text-white transition">Envios</Link>
+                                <Link to="/politicas#envio" className="hover:text-white transition">Envios</Link>
                             </li>
                             <li>
-                                <Link to="/politicas" className="hover:text-white transition">Devoluções</Link>
+                                <Link to="/politicas#devo" className="hover:text-white transition">Devoluções</Link>
                             </li>
                             <li>
-                                <Link to="/politicas" className="hover:text-white transition">Garantia</Link>
+                                <Link to="/politicas#garantia" className="hover:text-white transition">Garantia</Link>
                             </li>
                         </ul>
                     </div>
@@ -57,12 +67,16 @@ function Footer() {
                             <li>
                                 <Link to="/search" className="hover:text-white transition">Buscar</Link>
                             </li>
-                            <li>
-                                <Link to="/profile" className="hover:text-white transition">Meu Perfil</Link>
-                            </li>
-                            <li>
-                                <Link to="/orders" className="hover:text-white transition">Meus Pedidos</Link>
-                            </li>
+                            {user && (
+                                <>
+                                    <li>
+                                        <Link to="/profile" className="hover:text-white transition">Meu Perfil</Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/orders" className="hover:text-white transition">Meus Pedidos</Link>
+                                    </li>
+                                </>
+                            )}
                         </ul>
                     </div>
 
@@ -78,7 +92,7 @@ function Footer() {
                             </li>
                             <li className="flex items-center gap-2">
                                 <Phone size={18} />
-                                <a href="tel:+258835130967" className="hover:text-white transition">
+                                <a href="https://wa.me/258835130967" className="hover:text-white transition">
                                     +258 83 513 0967
                                 </a>
                             </li>
@@ -94,9 +108,9 @@ function Footer() {
                 {/* Links Rápidos */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 text-sm text-gray-400">
                     <Link to="/politicas" className="hover:text-white transition">Política de Privacidade</Link>
-                    <Link to="/termos" className="hover:text-white transition">Termos de Serviço</Link>
-                    <Link to="/politicas" className="hover:text-white transition">Política de Cookies</Link>
-                    
+                    <Link to="/politicas#termos" className="hover:text-white transition">Termos de Serviço</Link>
+                    <Link to="/politicas#cookies" className="hover:text-white transition">Política de Cookies</Link>
+
                 </div>
 
                 {/* Copyright */}

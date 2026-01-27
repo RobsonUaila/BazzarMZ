@@ -80,15 +80,3 @@ Para que seu site abra em `bazzarmz.shop` em vez de `onrender.com`:
 
 - O plano gratuito do Render entra em "sleep" após 15 minutos de inatividade. O primeiro acesso pode demorar até 50 segundos.
 - Certifique-se de que seu banco de dados aceita conexões externas.
-
-## 🔧 Solução de Problemas (Troubleshooting)
-
-### Erro: ERESOLVE unable to resolve dependency tree (Docker)
-Se o deploy falhar com erros mencionando `cloudinary` e `multer-storage-cloudinary`, é um conflito de versões de dependências.
-
-**Correção no Dockerfile:**
-Altere o comando de instalação para ignorar conflitos de dependências pares:
-
-```dockerfile
-RUN npm install --only=production --legacy-peer-deps
-```

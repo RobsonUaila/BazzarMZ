@@ -9,7 +9,7 @@ WORKDIR /app
 # Copy backend
 COPY backEnd ./backEnd
 WORKDIR /app/backEnd
-RUN npm install --only=production
+RUN npm install --only=production --legacy-peer-deps
 
 # Copy frontend
 WORKDIR /app

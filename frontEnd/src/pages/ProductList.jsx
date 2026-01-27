@@ -16,6 +16,13 @@ function ProductList() {
   const [favorites, setFavorites] = useState([]);
 
   const productsPerPage = 12;
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+  const getImageUrl = (path) => {
+    if (!path) return 'https://via.placeholder.com/300?text=Sem+Imagem';
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    return `${apiUrl}/uploads/images/${path}`;
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -25,7 +32,6 @@ function ProductList() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       let url = `${apiUrl}/api/produtos?page=${currentPage}&limit=${productsPerPage}`;
       
       if (searchTerm) url += `&search=${searchTerm}`;
@@ -36,74 +42,19 @@ function ProductList() {
       if (!response.ok) throw new Error('Erro ao carregar produtos');
       
       const data = await response.json();
-      setProducts(data.produtos || data);
-      setTotalPages(Math.ceil((data.total || data.length) / productsPerPage));
+      
+      // Ajuste para estrutura do backend: { success: true, data: [...], pagination: {...} }
+      // Garante que pegamos o array, seja em data.data, data.produtos ou no próprio data
+      const listaProdutos = (data.data && Array.isArray(data.data)) ? data.data : (data.produtos && Array.isArray(data.produtos) ? data.produtos : (Array.isArray(data) ? data : []));
+      setProducts(listaProdutos);
+
+      const totalPagesCalc = data.pagination?.pages || Math.ceil((data.total || listaProdutos.length) / productsPerPage);
+      setTotalPages(totalPagesCalc || 1);
     } catch (error) {
       console.error(error);
       // Fallback para produtos estáticos
-      const staticProducts = [
-        {
-          id: 1,
-          nome: "Camiseta Premium",
-          preco: 89.90,
-          imagem: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-          imagem_capa: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-          categoria: "Vestuário",
-          descricao: "Camiseta de alta qualidade em algodão 100%",
-          estoque: 15
-        },
-        {
-          id: 2,
-          nome: "Jeans Clássico",
-          preco: 159.90,
-          imagem: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop",
-          imagem_capa: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop",
-          categoria: "Vestuário",
-          descricao: "Jeans resistente e confortável",
-          estoque: 8
-        },
-        {
-          id: 3,
-          nome: "Tênis Esportivo",
-          preco: 299.90,
-          imagem: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop",
-          imagem_capa: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop",
-          categoria: "Calçados",
-          descricao: "Tênis com tecnologia de amortecimento",
-          estoque: 12
-        },
-        {
-          id: 4,
-          nome: "Jaqueta de Couro",
-          preco: 449.90,
-          imagem: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop",
-          imagem_capa: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop",
-          categoria: "Vestuário",
-          descricao: "Jaqueta autêntica de couro genuíno",
-          estoque: 5
-        },
-        {
-          id: 5,
-          nome: "Relógio Elegante",
-          preco: 599.90,
-          imagem: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop",
-          imagem_capa: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop",
-          categoria: "Acessórios",
-          descricao: "Relógio suíço de precisão",
-          estoque: 3
-        },
-        {
-          id: 6,
-          nome: "Mochila Urban",
-          preco: 189.90,
-          imagem: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop",
-          imagem_capa: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop",
-          categoria: "Acessórios",
-          descricao: "Mochila resistente para uso diário",
-          estoque: 20
-        }
-      ];
-      setProducts(staticProducts);
+      setProducts([]);
+      toastError('Não foi possível carregar os produtos.');
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -137,7 +88,7 @@ function ProductList() {
 
   const addToCart = (product) => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find(item => item.id === product.id);
+    const existingItem = cart.find(item => String(item.id) === String(product.id));
 
     if (existingItem) {
       existingItem.quantity += 1;
@@ -238,7 +189,7 @@ function ProductList() {
                   <Link to={`/produto/${product.id}`}>
                     <div className="relative h-48 bg-gray-100 overflow-hidden cursor-pointer">
                       <img
-                        src={product.imagem_capa || product.imagem}
+                        src={getImageUrl(product.imagem_capa || product.imagem)}
                         alt={product.nome}
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
                       />

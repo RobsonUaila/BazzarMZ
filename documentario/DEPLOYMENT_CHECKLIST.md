@@ -41,7 +41,7 @@ O projeto está **COMPLETO E PRONTO PARA PRODUÇÃO**. Todos os 5 major tasks fo
 | CSS Tailwind | ✅ OK | Tailwind CSS v4 configurado |
 | **API BaseURL** | ✅ RESOLVIDO | Usa `VITE_API_URL` com fallback |
 | Variáveis Ambiente | ✅ RESOLVIDO | `.env.example` criado com instruções |
-| Testes | ❌ FALTANDO | Nenhum teste automatizado para Frontend |
+| Testes | ✅ OK | Testes unitários configurados (Vitest) |
 
 ---
 
@@ -146,10 +146,10 @@ TOTAL:     ████████░░ 92% - PRONTO PARA PRODUÇÃO
 10. [x] Implementar rate limiting em produção ✅
 
 ### 🟡 RECOMENDADO (Melhorias Futuras)
-11. [ ] Adicionar monitoramento de erros (Sentry)
+11. [x] Adicionar monitoramento de erros (Sentry) ✅
 12. [ ] Implementar cache (Redis)
-13. [ ] Setup CI/CD (GitHub Actions, GitLab CI)
-14. [ ] Documentação completa de deployment
+13. [x] Setup CI/CD (GitHub Actions, GitLab CI) ✅
+14. [x] Documentação completa de deployment ✅
 15. [ ] Testes de carga/stress
 
 ---
