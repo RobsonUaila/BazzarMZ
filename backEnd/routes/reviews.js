@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const reviewsController = require('../controllers/reviewsController');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 // Obter reviews de um produto
 router.get('/produto/:productId/reviews', reviewsController.getProductReviews);

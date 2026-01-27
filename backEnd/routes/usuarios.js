@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const usuariosController = require('../controllers/usuariosController');
 const db = require('../db');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 // Rotas de Usuários
 router.get('/', usuariosController.getAllUsuarios);

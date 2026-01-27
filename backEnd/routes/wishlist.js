@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const wishlistController = require('../controllers/wishlistController');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 // Obter wishlist do usuário (requer auth)
 router.get('/', auth.verificarToken, wishlistController.getUserWishlist);

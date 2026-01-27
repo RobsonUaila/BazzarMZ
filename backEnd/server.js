@@ -7,7 +7,6 @@ require('dotenv').config();
 const cors = require('cors');
 const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
-const Sentry = require('@sentry/node');
 const swaggerSpecs = require('./config/swagger');
 const { loggerMiddleware } = require('./middleware/logger');
 const { apiLimiter, authLimiter, uploadLimiter } = require('./middleware/rateLimit');
@@ -18,30 +17,15 @@ const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3000;
 
-// Sentry Initialization (Monitoramento)
-if (process.env.SENTRY_DSN) {
-    Sentry.init({
-        dsn: process.env.SENTRY_DSN,
-        integrations: [
-            // enable HTTP calls tracing
-            new Sentry.Integrations.Http({ tracing: true }),
-            // enable Express.js tracing
-            new Sentry.Integrations.Express({ app }),
-        ],
-        tracesSampleRate: 1.0,
-    });
-    // RequestHandler creates a separate execution context using domains, so that every
-    // transaction/span/breadcrumb is attached to its own Hub instance
-    app.use(Sentry.Handlers.requestHandler());
-    // TracingHandler creates a trace for every incoming request
-    app.use(Sentry.Handlers.tracingHandler());
-    console.log('✅ Monitoramento Sentry ativado');
-}
+// Sentry Initialization (Monitoramento) - Desativado por enquanto
+// Instale com: npm install @sentry/node se quiser usar
 
 // MIDDLEWARES DE SEGURANÇA E CONFIGURAÇÃO
 
 // Protege headers HTTP contra vulnerabilidades
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // Forçar HTTPS em Produção
 if (isProduction) {
@@ -81,7 +65,7 @@ app.use(loggerMiddleware);
 app.use(express.json());
 
 // Serve arquivos estáticos (uploads)
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // IMPORTAR ROTAS
@@ -90,7 +74,7 @@ app.use('/uploads', express.static('uploads'));
 const usuariosRouter = require('./routes/usuarios');
 const pedidosRouter = require('./routes/pedidos');
 const itensRouter = require('./routes/itensPedidos');
-const uploadsRouter = require('./routes/uploads');
+const produtosRouter = require('./routes/produtos');
 const ErrorResponse = require('./utils/ErrorResponse');
 const errorHandler = require('./middleware/error');
 
@@ -104,14 +88,11 @@ app.use(apiLimiter);
 app.post('/api/usuarios/login', authLimiter);
 app.post('/api/usuarios', authLimiter);
 
-// Apply upload rate limiting
-app.use('/api/upload', uploadLimiter);
-
 // Mount routes
 app.use('/api/usuarios', usuariosRouter);
 app.use('/api/pedidos', pedidosRouter);
 app.use('/api/itens-pedidos', itensRouter);
-app.use('/api/upload', uploadsRouter);
+app.use('/api/produtos', produtosRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Tratamento de rotas API não encontradas (antes do frontend)
@@ -150,12 +131,12 @@ if (isProduction) {
     });
 }
 
-
 // MIDDLEWARE DE ERRO (SEMPRE POR ÚLTIMO)
 
-if (process.env.SENTRY_DSN) {
-    app.use(Sentry.Handlers.errorHandler());
-}
+// Sentry error handler - desativado por enquanto
+// if (process.env.SENTRY_DSN) {
+//     app.use(Sentry.Handlers.errorHandler());
+// }
 
 app.use(errorHandler);
 

@@ -7,7 +7,7 @@ const {
   deletePedido
 } = require('../controllers/pedidosController');
 
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const role = require('../middleware/role');
 
 const router = express.Router();
