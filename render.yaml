@@ -19,5 +19,7 @@ services:
         value: ecommerce
       - key: JWT_SECRET
         generateValue: true
-      - key: ALLOWED_ORIGINS
+      - key: VITE_API_URL
+        value: https://bazzarmz-ecommerce.onrender.com/api
+    - key: ALLOWED_ORIGINS
         value: https://bazzarmz-ecommerce.onrender.com,https://bazzarmz.shop,https://www.bazzarmz.shop
