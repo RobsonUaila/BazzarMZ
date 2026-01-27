@@ -15,6 +15,8 @@ RUN npm install --only=production --legacy-peer-deps
 WORKDIR /app
 COPY frontEnd ./frontEnd
 WORKDIR /app/frontEnd
+ARG VITE_API_URL=http://localhost:3000/api
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm install && npm run build
 
 # Production stage
