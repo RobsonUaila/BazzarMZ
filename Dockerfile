@@ -15,7 +15,7 @@ RUN npm install --only=production --legacy-peer-deps
 WORKDIR /app
 COPY frontEnd ./frontEnd
 WORKDIR /app/frontEnd
-ENV VITE_API_URL=https://bazzarmz-ecommerce.onrender.com/api
+ENV VITE_API_URL=https://bazzarmz-ecommerce.onrender.com
 RUN npm install && npm run build
 
 # Production stage
