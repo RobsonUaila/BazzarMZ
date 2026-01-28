@@ -111,11 +111,11 @@ Subtotal:  ${subtotal.toFixed(2)} Mts
 Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
 *Total: ${total.toFixed(2)} Mts*
 
-*Método de Pagamento:* Dinheiro na Entrega (COD)
+*Método de Pagamento:* Dinheiro na Entrega!
 *Status:* Aguardando Confirmação`;
 
     // Número de WhatsApp da loja (adicione seu número aqui)
-    const numeroWhatsApp = '258835130967'; // Substitua pelo número real da loja
+    const numeroWhatsApp = 'https://wa.me/258835130967'; // Substitua pelo número real da loja
 
     // Codificar mensagem para URL
     const mensagemCodificada = encodeURIComponent(mensagem);
@@ -266,7 +266,7 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                         name="confirmacao"
                         checked={formData.confirmacao}
                         onChange={handleInputChange}
-                        className="w-5 h-5 mt-1 rounded accent-blue-600"
+                        className="w-5 h-5 rounded accent-blue-600 shrink-0"
                       />
                       <span className="text-gray-700">
                         <span className="font-semibold">Confirmo que desejo adquirir este(s) produto(s)</span>
