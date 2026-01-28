@@ -13,6 +13,8 @@ const { apiLimiter, authLimiter, uploadLimiter } = require('./middleware/rateLim
 
 const app = express();
 
+app.set('trust proxy', 1); // Confia no primeiro proxy (Render)
+
 // Railway & Production Support
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3000;

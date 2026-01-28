@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const usuarioSchema = require('../validators/usuarioValidator');
 
 const jwtSecret = process.env.JWT_SECRET;
-console.log('JWT_SECRET no controlador:', jwtSecret ? 'Definido (tamanho: ' + jwtSecret.length + ')' : 'Não Definido');
 
 exports.getAllUsuarios = (req, res) => {
     const sql = 'SELECT idusuarios, nome, email, role FROM usuarios';
@@ -53,7 +52,7 @@ exports.loginUsuario = (req, res) => {
 
     db.query(sql, [email], async (err, results) => {
         if (err) {
-            console.error('Erro no login (SQL):', err);
+            console.error('Erro no login:', err);
             return res.status(500).json({ message: 'Erro interno no servidor' });
         }
         if (results.length === 0) return res.status(401).json({ message: 'usuario nao encontrado' });
