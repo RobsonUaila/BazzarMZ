@@ -14,6 +14,9 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: dbName,  // Forçado para 'ecommerce'
     port: process.env.DB_PORT || 3306,
+    ssl: {
+        minVersion: 'TLSv1.2'
+    },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
