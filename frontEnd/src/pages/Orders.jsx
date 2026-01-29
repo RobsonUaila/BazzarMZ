@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Package, CheckCircle, Clock, Truck, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 
@@ -74,6 +76,64 @@ function Orders() {
     return colorMap[status] || 'bg-gray-100 text-gray-800';
   };
 
+  const handleDownloadPDF = (order) => {
+    const doc = new jsPDF();
+
+    // Cabeçalho da Empresa
+    doc.setFontSize(22);
+    doc.setTextColor(37, 99, 235); // Azul do site
+    doc.text("BazzarMZ", 105, 20, null, null, "center");
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text("Recibo de Pedido", 105, 30, null, null, "center");
+
+    // Informações do Pedido
+    doc.text(`Pedido Nº: ${order.id}`, 20, 50);
+    doc.text(`Data: ${new Date(order.date).toLocaleDateString('pt-MZ')}`, 20, 60);
+    doc.text(`Status: ${order.status.toUpperCase()}`, 20, 70);
+    if (order.trackingNumber) {
+      doc.text(`Rastreio: ${order.trackingNumber}`, 20, 80);
+    }
+
+    // Tabela de Produtos
+    const tableColumn = ["Produto", "Qtd", "Preço Unit.", "Subtotal"];
+    const tableRows = [];
+
+    order.items.forEach(item => {
+      const itemData = [
+        item.name,
+        item.quantity,
+        `MT ${item.price.toFixed(2)}`,
+        `MT ${(item.price * item.quantity).toFixed(2)}`
+      ];
+      tableRows.push(itemData);
+    });
+
+    doc.autoTable({
+      startY: 90,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'grid',
+      headStyles: { fillColor: [37, 99, 235] }, // Azul
+    });
+
+    // Total
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text(`Total Geral: MT ${order.total.toFixed(2)}`, 140, finalY);
+
+    // Rodapé
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100);
+    doc.text("Obrigado pela sua preferência!", 105, finalY + 20, null, null, "center");
+
+    // Salvar arquivo
+    doc.save(`Recibo_BazzarMZ_${order.id}.pdf`);
+  };
+
   return (
     <div>
       <Navbar />
@@ -141,7 +201,10 @@ function Orders() {
                       <p className="text-2xl font-bold">Mts {order.total.toFixed(2)}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                      <button 
+                        onClick={() => handleDownloadPDF(order)}
+                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                      >
                         <FileText size={18} />
                         Ver Nota
                       </button>

@@ -249,23 +249,36 @@ router.put('/:id', auth, authorize('admin'), handleUploadErrors, (req, res, next
 
 // DELETE - Deletar produto (admin)
 router.delete('/:id', auth, authorize('admin'), (req, res, next) => {
-    try {
-        const sql = 'DELETE FROM produtos WHERE id = ?';
-        pool.query(sql, [req.params.id], (err, results) => {
-            if (err) {
-                return next(new ErrorResponse(`Erro ao deletar produto: ${err.message}`, 500));
-            }
-            if (results.affectedRows === 0) {
-                return next(new ErrorResponse('Produto não encontrado', 404));
-            }
-            res.json({
-                success: true,
-                message: 'Produto deletado com sucesso'
+    const produtoId = req.params.id;
+
+    // 1. Remover dependências (Reviews e Wishlist) antes de apagar o produto
+    const deleteReviews = 'DELETE FROM reviews WHERE produto_id = ?';
+    const deleteWishlist = 'DELETE FROM wishlist WHERE produto_id = ?';
+    const deleteProduto = 'DELETE FROM produtos WHERE id = ?';
+
+    pool.query(deleteReviews, [produtoId], (err) => {
+        if (err) return next(new ErrorResponse(`Erro ao apagar reviews: ${err.message}`, 500));
+
+        pool.query(deleteWishlist, [produtoId], (err) => {
+            if (err) return next(new ErrorResponse(`Erro ao apagar wishlist: ${err.message}`, 500));
+
+            pool.query(deleteProduto, [produtoId], (err, results) => {
+                if (err) {
+                    if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+                        return next(new ErrorResponse('Não é possível apagar este produto pois ele faz parte de pedidos realizados.', 400));
+                    }
+                    return next(new ErrorResponse(`Erro ao deletar produto: ${err.message}`, 500));
+                }
+                if (results.affectedRows === 0) {
+                    return next(new ErrorResponse('Produto não encontrado', 404));
+                }
+                res.json({
+                    success: true,
+                    message: 'Produto deletado com sucesso'
+                });
             });
         });
-    } catch (error) {
-        next(error);
-    }
+    });
 });
 
 // GET - Listar reviews de um produto

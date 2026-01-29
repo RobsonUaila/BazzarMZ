@@ -38,6 +38,36 @@ const AdminDashboard = () => {
 
   if (!user) return null;
 
+  const handleDelete = async (id) => {
+      if (window.confirm('Tem certeza que deseja apagar este produto? Esta ação não pode ser desfeita.')) {
+          try {
+              const token = localStorage.getItem('token'); // Pegando o token salvo
+              const response = await fetch(`http://localhost:3000/api/produtos/${id}`, {
+                  method: 'DELETE',
+                  headers: {
+                      'Authorization': `Bearer `,
+                      'Content-Type': 'application/json'
+                  }
+              });
+              
+              const data = await response.json();
+              
+              if (data.success) {
+                  alert('Produto apagado com sucesso!');
+                  // Aqui você deve atualizar a lista de produtos
+                  // Exemplo: setProdutos(produtos.filter(p => p.id !== id));
+                  window.location.reload(); 
+              } else {
+                  alert(data.message || 'Erro ao apagar produto');
+              }
+          } catch (error) {
+              console.error('Erro:', error);
+              alert('Erro de conexão com o servidor');
+          }
+      }
+  };
+  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -75,8 +105,9 @@ const AdminDashboard = () => {
         <header className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
-            <p className="text-gray-500">Bem-vindo de volta, {user.nome}</p>
+            <p className="text-gray-500">Bem-vindo de volta, Mestre!</p>
           </div>
+
           <Link to="/product-registration" className="hidden md:flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
             <PlusCircle className="w-5 h-5 mr-2" />
             Novo Produto
@@ -118,6 +149,13 @@ const AdminDashboard = () => {
                 <h4 className="font-semibold text-gray-800 group-hover:text-blue-600">Cadastrar Produto</h4>
                 <p className="text-sm text-gray-500 mt-1">Adicionar novos itens ao catálogo</p>
              </Link>
+             <button 
+                 onClick={() => handleDelete(produto.id)} 
+                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+             >
+                 Apagar
+             </button>
+             
              <Link to="/" className="p-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition group">
                 <h4 className="font-semibold text-gray-800 group-hover:text-blue-600">Ver Loja</h4>
                 <p className="text-sm text-gray-500 mt-1">Acessar a página inicial como cliente</p>

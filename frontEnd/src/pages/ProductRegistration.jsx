@@ -41,7 +41,7 @@ function ProductRegistration() {
 
     if (file) {
       setFiles(prev => ({ ...prev, [name]: file }));
-      
+
       // Criar preview
       const previewUrl = URL.createObjectURL(file);
       if (name === 'imagem_capa') setImagePreview(previewUrl);
@@ -77,7 +77,7 @@ function ProductRegistration() {
       }
 
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      
+
       // Usar FormData para envio de arquivos
       const data = new FormData();
       data.append('nome', formData.nome);
@@ -85,10 +85,10 @@ function ProductRegistration() {
       data.append('preco', formData.preco);
       data.append('categoria', formData.categoria);
       data.append('estoque', formData.estoque);
-      
+
       if (files.imagem_capa) data.append('imagem_capa', files.imagem_capa);
       if (files.imagem) data.append('imagem', files.imagem);
-      
+
       gifFiles.forEach((gif) => {
         data.append('gifs', gif);
       });
@@ -129,7 +129,7 @@ function ProductRegistration() {
 
           <div className="bg-white rounded-lg shadow-md p-8">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastrar Novo Produto</h1>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Nome */}
@@ -186,9 +186,9 @@ function ProductRegistration() {
                         {gifFiles.map((gif, index) => (
                           <div key={index} className="flex items-center justify-between p-3 bg-white rounded border border-gray-300">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <img 
-                                src={URL.createObjectURL(gif)} 
-                                alt="Preview" 
+                              <img
+                                src={URL.createObjectURL(gif)}
+                                alt="Preview"
                                 className="w-10 h-10 object-cover rounded"
                               />
                               <p className="text-sm text-gray-600 truncate">{gif.name}</p>
@@ -207,6 +207,22 @@ function ProductRegistration() {
                   )}
                 </div>
 
+                {/* Descrição de Texto */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descrição de Texto *
+                  </label>
+                  <textarea
+                    name="descricao"
+                    rows="4"
+                    required
+                    value={formData.descricao}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Descreva detalhes do produto, características, material, etc."
+                  />
+                </div>
+
                 {/* Fotografia de Capa */}
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -220,7 +236,7 @@ function ProductRegistration() {
                     onChange={handleFileChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   />
-                  
+
                   {imagePreview && (
                     <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600 mb-2">Preview da Capa:</p>

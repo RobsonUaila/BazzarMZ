@@ -22,7 +22,8 @@ exports.createUsuario = async (req, res) => {
         return res.status(400).json({ message: error.details[0].message });
     }
 
-    const { nome, email, senha, role } = req.body;
+    let { nome, email, senha, role } = req.body;
+    email = email.trim();
 
     try {
         const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
@@ -42,11 +43,13 @@ exports.createUsuario = async (req, res) => {
 };
 
 exports.loginUsuario = (req, res) => {
-    const { email, senha } = req.body;
+    let { email, senha } = req.body;
 
     if (!email || !senha) {
         return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
     }
+
+    email = email.trim();
 
     const sql = 'SELECT * FROM usuarios WHERE email = ?';
 
