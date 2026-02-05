@@ -11,7 +11,7 @@ const asyncHandler = require('../middleware/async');
 
 // FunÃ§Ã£o para enviar o token como cookie
 const sendTokenResponse = (user, statusCode, res) => {
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.id || user.idusuarios, role: user.role }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '24h'
     });
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, optionalAuth, authorize } = require('../middleware/auth');
 const ErrorResponse = require('../utils/ErrorResponse');
 
 /**
@@ -156,9 +156,9 @@ router.get('/:id', auth, (req, res, next) => {
  *       201:
  *         description: Pedido criado com sucesso.
  */
-router.post('/', auth, (req, res, next) => { // Rota para criar um novo pedido
+router.post('/', optionalAuth, (req, res, next) => { // Rota para criar um novo pedido (login opcional)
     const { items, nome_cliente, telefone, endereco } = req.body;
-    const usuario_id = req.user.id;
+    const usuario_id = req.user?.id || req.usuario?.id || null;
 
     // Validação inicial
     if (!items || !Array.isArray(items) || items.length === 0) {

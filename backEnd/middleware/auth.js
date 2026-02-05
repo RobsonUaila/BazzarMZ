@@ -1,4 +1,4 @@
-const jwt = require ('jsonwebtoken');
+﻿const jwt = require ('jsonwebtoken');
 const JwtSecret = process.env.JWT_SECRET;
 
 const auth = (req, res, next) =>{
@@ -12,23 +12,42 @@ const auth = (req, res, next) =>{
 
     jwt.verify(token, JwtSecret, (err, decoded)=>{
         if(err){
-            return res.status(401).json({ message: 'Token inválido ou expirado', error: err.message });
+            return res.status(401).json({ message: 'Token invÃ¡lido ou expirado', error: err.message });
         }
         
         if(!decoded){
-            return res.status(401).json({message:'Token inválido'});
+            return res.status(401).json({message:'Token invÃ¡lido'});
         }
         
         req.usuario = decoded;
+        req.user = decoded;
         next();
     });
 };
 
-// Middleware para verificar role/autorização
+
+// Middleware opcional: se houver token, valida; se nÃ£o houver, segue como convidado
+const optionalAuth = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return next();
+
+    const token = authHeader.split(' ')[1];
+    if (!token) return next();
+
+    jwt.verify(token, JwtSecret, (err, decoded)=> {
+        if (err || !decoded) {
+            return res.status(401).json({ message: 'Token invÃ¡lido ou expirado' });
+        }
+        req.usuario = decoded;
+        req.user = decoded;
+        next();
+    });
+};
+// Middleware para verificar role/autorizaÃ§Ã£o
 const authorize = (role) => {
     return (req, res, next) => {
         if (!req.usuario) {
-            return res.status(401).json({ message: 'Não autenticado' });
+            return res.status(401).json({ message: 'NÃ£o autenticado' });
         }
         
         if (req.usuario.role !== role) {
@@ -39,4 +58,5 @@ const authorize = (role) => {
     };
 };
 
-module.exports = { auth, authorize };
+module.exports = { auth, optionalAuth, authorize };
+
