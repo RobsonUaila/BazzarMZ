@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -9,7 +9,7 @@ const { auth, authorize } = require('../middleware/auth');
 const ErrorResponse = require('../utils/ErrorResponse');
 const asyncHandler = require('../middleware/async');
 
-// Função para enviar o token como cookie
+// FunÃ§Ã£o para enviar o token como cookie
 const sendTokenResponse = (user, statusCode, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '24h'
@@ -33,36 +33,82 @@ const sendTokenResponse = (user, statusCode, res) => {
        });
 };
 
-// @desc    Login de usuário
+// @desc    Login de usuÃ¡rio
 // @route   POST /api/usuarios/login
 router.post('/login', asyncHandler(async (req, res, next) => {
     const { email, senha } = req.body;
 
     if (!email || !senha) {
-        return next(new ErrorResponse('Por favor, forneça email e senha', 400));
+        return next(new ErrorResponse('Por favor, forneÃ§a email e senha', 400));
     }
 
     const sql = 'SELECT * FROM usuarios WHERE email = ?';
     pool.query(sql, [email], async (err, results) => {
         if (err) return next(new ErrorResponse('Erro de servidor', 500));
-        if (results.length === 0) return next(new ErrorResponse('Credenciais inválidas', 401));
+        if (results.length === 0) return next(new ErrorResponse('Credenciais invÃ¡lidas', 401));
 
         const user = results[0];
 
         const isMatch = await bcrypt.compare(senha, user.senha);
-        if (!isMatch) return next(new ErrorResponse('Credenciais inválidas', 401));
+        if (!isMatch) return next(new ErrorResponse('Credenciais invÃ¡lidas', 401));
 
         sendTokenResponse(user, 200, res);
     });
 }));
 
-// @desc    Verificar usuário atual (Sessão)
+// @desc    Registrar usuÃ¡rio
+// @route   POST /api/usuarios
+router.post('/', asyncHandler(async (req, res, next) => {
+    const { nome, email, senha } = req.body;
+
+    if (!nome || !email || !senha) {
+        return next(new ErrorResponse('Por favor, forneÃ§a nome, email e senha', 400));
+    }
+
+    if (senha.length < 6) {
+        return next(new ErrorResponse('A senha deve ter pelo menos 6 caracteres', 400));
+    }
+
+    const emailTrim = String(email).trim().toLowerCase();
+    const nomeTrim = String(nome).trim();
+
+    const checkSql = 'SELECT id FROM usuarios WHERE email = ?';
+    pool.query(checkSql, [emailTrim], async (err, results) => {
+        if (err) return next(new ErrorResponse('Erro de servidor', 500));
+        if (results.length > 0) return next(new ErrorResponse('Email jÃ¡ cadastrado', 409));
+
+        try {
+            const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 10;
+            const hashedPassword = await bcrypt.hash(senha, saltRounds);
+            const role = 'user';
+
+            const insertSql = 'INSERT INTO usuarios (nome, email, senha, role) VALUES (?, ?, ?, ?)';
+            pool.query(insertSql, [nomeTrim, emailTrim, hashedPassword, role], (err, result) => {
+                if (err) return next(new ErrorResponse('Erro ao criar usuÃ¡rio', 500));
+
+                res.status(201).json({
+                    success: true,
+                    message: 'UsuÃ¡rio criado com sucesso',
+                    user: {
+                        id: result.insertId,
+                        nome: nomeTrim,
+                        email: emailTrim,
+                        role
+                    }
+                });
+            });
+        } catch (hashError) {
+            return next(new ErrorResponse('Erro ao criptografar a senha', 500));
+        }
+    });
+}));
+// @desc    Verificar usuÃ¡rio atual (SessÃ£o)
 // @route   GET /api/usuarios/me
 // @access  Private
 router.get('/me', auth, asyncHandler(async (req, res, next) => {
     const sql = 'SELECT id, nome, email, role, data_criacao FROM usuarios WHERE id = ?';
     pool.query(sql, [req.user.id], (err, results) => {
-        if (err) return next(new ErrorResponse('Erro ao buscar dados do usuário', 500));
+        if (err) return next(new ErrorResponse('Erro ao buscar dados do usuÃ¡rio', 500));
         res.status(200).json({
             success: true,
             data: results[0]
@@ -77,7 +123,7 @@ router.get('/', auth, authorize('admin'), asyncHandler(async (req, res, next) =>
     const sql = 'SELECT id, nome, email, role, data_criacao FROM usuarios ORDER BY data_criacao DESC';
     pool.query(sql, (err, results) => {
         if (err) {
-            return next(new ErrorResponse('Erro ao buscar usuários', 500));
+            return next(new ErrorResponse('Erro ao buscar usuÃ¡rios', 500));
         }
         res.status(200).json({
             success: true,
@@ -95,16 +141,16 @@ router.put('/:id/role', auth, authorize('admin'), asyncHandler(async (req, res, 
     const { id } = req.params;
 
     if (!role || !['admin', 'user'].includes(role)) {
-        return next(new ErrorResponse('Cargo inválido', 400));
+        return next(new ErrorResponse('Cargo invÃ¡lido', 400));
     }
 
     const sql = 'UPDATE usuarios SET role = ? WHERE id = ?';
     pool.query(sql, [role, id], (err, result) => {
         if (err) {
-            return next(new ErrorResponse('Erro ao atualizar cargo do usuário', 500));
+            return next(new ErrorResponse('Erro ao atualizar cargo do usuÃ¡rio', 500));
         }
         if (result.affectedRows === 0) {
-            return next(new ErrorResponse('Usuário não encontrado', 404));
+            return next(new ErrorResponse('UsuÃ¡rio nÃ£o encontrado', 404));
         }
         res.status(200).json({ success: true, message: 'Cargo atualizado com sucesso' });
     });
@@ -117,21 +163,21 @@ router.delete('/:id', auth, authorize('admin'), asyncHandler(async (req, res, ne
     const { id } = req.params;
 
     if (req.user.id === parseInt(id, 10)) {
-        return next(new ErrorResponse('Você não pode apagar sua própria conta de administrador.', 400));
+        return next(new ErrorResponse('VocÃª nÃ£o pode apagar sua prÃ³pria conta de administrador.', 400));
     }
 
     const sql = 'DELETE FROM usuarios WHERE id = ?';
     pool.query(sql, [id], (err, result) => {
         if (err) {
             if (err.code === 'ER_ROW_IS_REFERENCED_2') {
-                return next(new ErrorResponse('Não é possível apagar este usuário pois ele possui pedidos associados.', 400));
+                return next(new ErrorResponse('NÃ£o Ã© possÃ­vel apagar este usuÃ¡rio pois ele possui pedidos associados.', 400));
             }
-            return next(new ErrorResponse('Erro ao apagar usuário', 500));
+            return next(new ErrorResponse('Erro ao apagar usuÃ¡rio', 500));
         }
         if (result.affectedRows === 0) {
-            return next(new ErrorResponse('Usuário não encontrado', 404));
+            return next(new ErrorResponse('UsuÃ¡rio nÃ£o encontrado', 404));
         }
-        res.status(200).json({ success: true, message: 'Usuário apagado com sucesso' });
+        res.status(200).json({ success: true, message: 'UsuÃ¡rio apagado com sucesso' });
     });
 }));
 
@@ -143,8 +189,8 @@ router.post('/forgotpassword', asyncHandler(async (req, res, next) => {
     const sql = 'SELECT * FROM usuarios WHERE email = ?';
     pool.query(sql, [email], (err, results) => {
         if (err || results.length === 0) {
-            // Resposta genérica para não revelar se um email existe ou não
-            return res.status(200).json({ success: true, data: 'Email enviado se o usuário existir.' });
+            // Resposta genÃ©rica para nÃ£o revelar se um email existe ou nÃ£o
+            return res.status(200).json({ success: true, data: 'Email enviado se o usuÃ¡rio existir.' });
         }
 
         const user = results[0];
@@ -156,9 +202,9 @@ router.post('/forgotpassword', asyncHandler(async (req, res, next) => {
         pool.query(updateSql, [hashedToken, new Date(expireDate), user.id], async (err, result) => {
             if (err) return next(new ErrorResponse('Erro ao salvar token de reset', 500));
 
-            // CORREÇÃO: A URL deve apontar para o frontend.
+            // CORREÃ‡ÃƒO: A URL deve apontar para o frontend.
             const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
-            const message = `Você solicitou a redefinição da sua senha. Por favor, clique no link a seguir para completar o processo:\n\n${resetUrl}\n\nSe você não solicitou isso, ignore este email.`;
+            const message = `VocÃª solicitou a redefiniÃ§Ã£o da sua senha. Por favor, clique no link a seguir para completar o processo:\n\n${resetUrl}\n\nSe vocÃª nÃ£o solicitou isso, ignore este email.`;
 
             try {
                 const transporter = nodemailer.createTransport({
@@ -170,7 +216,7 @@ router.post('/forgotpassword', asyncHandler(async (req, res, next) => {
                 await transporter.sendMail({
                     from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
                     to: user.email,
-                    subject: 'Redefinição de Senha - BazzarMZ',
+                    subject: 'RedefiniÃ§Ã£o de Senha - BazzarMZ',
                     text: message,
                 });
 
@@ -178,7 +224,7 @@ router.post('/forgotpassword', asyncHandler(async (req, res, next) => {
             } catch (emailError) {
                 console.error(emailError);
                 pool.query('UPDATE usuarios SET resetPasswordToken = NULL, resetPasswordExpire = NULL WHERE id = ?', [user.id]);
-                return next(new ErrorResponse('Não foi possível enviar o email', 500));
+                return next(new ErrorResponse('NÃ£o foi possÃ­vel enviar o email', 500));
             }
         });
     });
@@ -192,7 +238,7 @@ router.put('/resetpassword/:resettoken', asyncHandler(async (req, res, next) => 
     const sql = 'SELECT * FROM usuarios WHERE resetPasswordToken = ? AND resetPasswordExpire > NOW()';
     pool.query(sql, [resetPasswordToken], async (err, results) => {
         if (err || results.length === 0) {
-            return next(new ErrorResponse('Token inválido ou expirado', 400));
+            return next(new ErrorResponse('Token invÃ¡lido ou expirado', 400));
         }
 
         const user = results[0];
@@ -209,3 +255,4 @@ router.put('/resetpassword/:resettoken', asyncHandler(async (req, res, next) => 
 }));
 
 module.exports = router;
+
