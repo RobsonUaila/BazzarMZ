@@ -12,14 +12,14 @@ const asyncHandler = require('../middleware/async');
 // Função para enviar o token como cookie
 const sendTokenResponse = (user, statusCode, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || '1h'
+        expiresIn: process.env.JWT_EXPIRE || '24h'
     });
 
     const options = {
-        expires: new Date(Date.now() + 1 * 60 * 60 * 1000), 
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), 
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     };
     
     delete user.senha;
