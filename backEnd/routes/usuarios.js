@@ -72,7 +72,7 @@ router.post('/', asyncHandler(async (req, res, next) => {
     const emailTrim = String(email).trim().toLowerCase();
     const nomeTrim = String(nome).trim();
 
-    const checkSql = 'SELECT id FROM usuarios WHERE email = ?';
+    const checkSql = 'SELECT idusuarios FROM usuarios WHERE email = ?';
     pool.query(checkSql, [emailTrim], async (err, results) => {
         if (err) return next(new ErrorResponse('Erro de servidor', 500));
         if (results.length > 0) return next(new ErrorResponse('Email jÃ¡ cadastrado', 409));
