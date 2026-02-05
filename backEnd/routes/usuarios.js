@@ -56,6 +56,20 @@ router.post('/login', asyncHandler(async (req, res, next) => {
     });
 }));
 
+// @desc    Verificar usuário atual (Sessão)
+// @route   GET /api/usuarios/me
+// @access  Private
+router.get('/me', auth, asyncHandler(async (req, res, next) => {
+    const sql = 'SELECT id, nome, email, role, data_criacao FROM usuarios WHERE id = ?';
+    pool.query(sql, [req.user.id], (err, results) => {
+        if (err) return next(new ErrorResponse('Erro ao buscar dados do usuário', 500));
+        res.status(200).json({
+            success: true,
+            data: results[0]
+        });
+    });
+}));
+
 // @desc    Get all users
 // @route   GET /api/usuarios
 // @access  Private/Admin
