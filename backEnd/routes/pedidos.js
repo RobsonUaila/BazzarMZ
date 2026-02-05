@@ -86,7 +86,10 @@ router.get('/all', auth, authorize('admin'), (req, res, next) => {
         ORDER BY p.data_pedido DESC
     `;
     pool.query(sql, (err, pedidos) => {
-        if (err) return next(new ErrorResponse('Erro ao buscar todos os pedidos', 500));
+        if (err) {
+            console.error("❌ Erro DB (GET /all):", err);
+            return next(new ErrorResponse('Erro ao buscar todos os pedidos', 500));
+        }
         res.json({ success: true, data: pedidos });
     });
 });
@@ -168,6 +171,7 @@ router.post('/', auth, (req, res, next) => { // Rota para criar um novo pedido
     const getPricesSql = 'SELECT id, preco, nome, estoque FROM produtos WHERE id IN (?)';
     pool.query(getPricesSql, [productIds], (err, productsFromDb) => {
         if (err) {
+            console.error("❌ Erro DB (Verificar Produtos):", err);
             return next(new ErrorResponse('Erro ao verificar produtos no banco de dados.', 500));
         }
 
@@ -199,7 +203,10 @@ router.post('/', auth, (req, res, next) => { // Rota para criar um novo pedido
 
         // Inicia a transação para garantir a atomicidade da operação
         pool.getConnection((err, connection) => {
-            if (err) return next(new ErrorResponse('Erro de conexão com o banco de dados.', 500));
+            if (err) {
+                console.error("❌ Erro DB (Get Connection):", err);
+                return next(new ErrorResponse('Erro de conexão com o banco de dados.', 500));
+            }
 
             connection.beginTransaction(err => {
                 if (err) {

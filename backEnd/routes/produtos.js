@@ -290,13 +290,20 @@ router.delete('/:id', auth, authorize('admin'), (req, res, next) => {
     const deleteProduto = 'DELETE FROM produtos WHERE id = ?';
 
     pool.query(deleteReviews, [produtoId], (err) => {
-        if (err) return next(new ErrorResponse(`Erro ao apagar reviews: ${err.message}`, 500));
+        if (err) {
+            console.error("❌ Erro DB (Delete Reviews):", err);
+            return next(new ErrorResponse(`Erro ao apagar reviews: ${err.message}`, 500));
+        }
 
         pool.query(deleteWishlist, [produtoId], (err) => {
-            if (err) return next(new ErrorResponse(`Erro ao apagar wishlist: ${err.message}`, 500));
+            if (err) {
+                console.error("❌ Erro DB (Delete Wishlist):", err);
+                return next(new ErrorResponse(`Erro ao apagar wishlist: ${err.message}`, 500));
+            }
 
             pool.query(deleteProduto, [produtoId], (err, results) => {
                 if (err) {
+                    console.error("❌ Erro DB (Delete Produto):", err);
                     if (err.code === 'ER_ROW_IS_REFERENCED_2') {
                         return next(new ErrorResponse('Não é possível apagar este produto pois ele faz parte de pedidos realizados.', 400));
                     }
