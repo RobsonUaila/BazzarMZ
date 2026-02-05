@@ -23,7 +23,7 @@ function Footer() {
                             Sua loja online com os melhores produtos e os melhores preços.
                         </p>
                         <div className="flex gap-4">
-                            <a href="#" className="text-gray-400 hover:text-white transition">
+                            <a href="https://www.facebook.com/share/1CHKSfXtRv/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">
                                 <Facebook size={20} />
                             </a>
                             <a href="#" className="text-gray-400 hover:text-white transition">
@@ -31,9 +31,6 @@ function Footer() {
                             </a>
                             <a href="#" className="text-gray-400 hover:text-white transition">
                                 <Instagram size={20} />
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition">
-                                <Linkedin size={20} />
                             </a>
                         </div>
                     </div>

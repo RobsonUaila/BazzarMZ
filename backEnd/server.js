@@ -5,6 +5,7 @@ const express = require('express');
 const path = require('path');
 require('dotenv').config();
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./config/swagger');
@@ -32,7 +33,7 @@ app.use(helmet({
             defaultSrc: ["'self'", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop"],
             connectSrc: ["'self'", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop"],
             imgSrc: ["'self'", "data:", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "https://res.cloudinary.com"],
-            scriptSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-eval'", "'unsafe-inline'"],
+            scriptSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-inline'"],
             styleSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-inline'"],
             fontSrc: ["'self'", "https:", "data:"],
             frameAncestors: ["'self'"],
@@ -73,6 +74,9 @@ app.use(cors(corsOptions));
 
 // Middleware de log de requisições
 app.use(loggerMiddleware);
+
+// Middleware para parse de cookies
+app.use(cookieParser());
 
 // Interpreta requisições com JSON no body
 app.use(express.json());

@@ -25,7 +25,7 @@ function Login() {
       const response = await fetch(`${apiUrl}/api/usuarios/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha: password })
+        body: JSON.stringify({ email, senha: password }),
       });
 
       const data = await response.json();
@@ -34,9 +34,13 @@ function Login() {
         throw new Error(data.message || 'Erro ao realizar login');
       }
 
+      // Salva o token para chamadas que usam Authorization header
       if (data.token) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('refreshToken', data.refreshToken);
+      }
+
+      // Com HttpOnly cookies, o token é salvo automaticamente pelo browser.
+      if (data.user) {
         localStorage.setItem('user', JSON.stringify(data.user));
         toastSuccess("Login realizado com sucesso!");
         
@@ -119,9 +123,9 @@ function Login() {
                 <input type="checkbox" className="mr-2" />
                 <span className="text-gray-700">Lembrar-me</span>
               </label>
-              <a href="#" className="text-blue-600 hover:text-blue-800">
+              <Link to="/forgot-password" className="text-blue-600 hover:text-blue-800">
                 Esqueceu a senha?
-              </a>
+              </Link>
             </div>
 
             <button
@@ -152,3 +156,4 @@ function Login() {
 }
 
 export default Login;
+

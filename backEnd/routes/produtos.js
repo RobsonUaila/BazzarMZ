@@ -7,8 +7,7 @@ const ErrorResponse = require('../utils/ErrorResponse');
 const pool = require('../db');
 const Joi = require('joi');
 const cloudinary = require('cloudinary').v2;
-const multerStorageCloudinary = require('multer-storage-cloudinary');
-const CloudinaryStorage = multerStorageCloudinary.CloudinaryStorage || multerStorageCloudinary;
+const streamifier = require('streamifier');
 
 // Configuração do Cloudinary
 cloudinary.config({
@@ -17,13 +16,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'bazarmz_produtos', // Nome da pasta no Cloudinary
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    }
-});
+const storage = multer.memoryStorage();
 
 const FILE_SIZE_LIMIT_MB = 30;
 const FILE_SIZE_LIMIT_BYTES = FILE_SIZE_LIMIT_MB * 1024 * 1024;
@@ -59,8 +52,48 @@ const handleUploadErrors = (req, res, next) => {
     });
 };
 
+// Middleware para upload direto para o Cloudinary (substitui multer-storage-cloudinary)
+const uploadToCloudinary = async (req, res, next) => {
+    if (!req.files || Object.keys(req.files).length === 0) return next();
+
+    const uploadStream = (file) => {
+        return new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'bazarmz_produtos',
+                    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp']
+                },
+                (error, result) => {
+                    if (result) {
+                        file.path = result.secure_url; // Atualiza o objeto file com a URL segura
+                        resolve(result);
+                    } else {
+                        reject(error);
+                    }
+                }
+            );
+            streamifier.createReadStream(file.buffer).pipe(stream);
+        });
+    };
+
+    try {
+        const promises = [];
+        Object.keys(req.files).forEach(key => {
+            req.files[key].forEach(file => {
+                promises.push(uploadStream(file));
+            });
+        });
+
+        await Promise.all(promises);
+        next();
+    } catch (error) {
+        console.error('Cloudinary Upload Error:', error);
+        next(new ErrorResponse('Erro ao fazer upload de imagens.', 500));
+    }
+};
+
 // POST - Criar novo produto (admin)
-router.post('/', auth, authorize('admin'), handleUploadErrors, (req, res, next) => {
+router.post('/', auth, authorize('admin'), handleUploadErrors, uploadToCloudinary, (req, res, next) => {
     try {
         // 1. Validação Rigorosa (Não confiar no frontend)
         const schema = Joi.object({
@@ -207,7 +240,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 // PUT - Atualizar produto (admin)
-router.put('/:id', auth, authorize('admin'), handleUploadErrors, (req, res, next) => {
+router.put('/:id', auth, authorize('admin'), handleUploadErrors, uploadToCloudinary, (req, res, next) => {
     try {
         const { nome, descricao, preco, categoria, estoque } = req.body;
 

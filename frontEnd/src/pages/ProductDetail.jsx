@@ -4,6 +4,7 @@ import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import { ShoppingCart, Heart, ArrowLeft, Star, MessageCircle, ThumbsUp } from 'lucide-react';
 import { toastError, toastSuccess } from '../utils/toast';
+import DOMPurify from 'dompurify';
 
 function ProductDetail() {
   const { id } = useParams();
@@ -163,14 +164,12 @@ function ProductDetail() {
 
     setSubmittingReview(true);
     try {
-      const token = localStorage.getItem('token');
-
       const response = await fetch(`${apiUrl}/api/produtos/${id}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify(newReview)
       });
 
@@ -285,7 +284,7 @@ function ProductDetail() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">Descrição</h2>
                   <div className="text-gray-700 leading-relaxed prose prose-blue max-w-none">
                     {product.descricao ? (
-                      <div dangerouslySetInnerHTML={{ __html: product.descricao }} />
+                      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.descricao) }} />
                     ) : (
                       <p>Sem descrição disponível</p>
                     )}

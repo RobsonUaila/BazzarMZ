@@ -1,22 +1,66 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, MapPin, Edit2, Save, X, ShoppingBag, Heart } from 'lucide-react';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
+import { toastError, toastSuccess } from '../utils/toast';
 
 function Profile() {
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
-    nome: 'João Silva',
-    email: 'joao@example.com',
-    telefone: '(+258) 84 123 4567',
-    endereco: 'Rua Principal, 123',
-    cidade: 'Maputo',
-    pais: 'Moçambique',
-    cep: '1100',
+    nome: '',
+    email: '',
+    telefone: '',
+    endereco: '',
+    cidade: '',
+    pais: '',
+    cep: '',
   });
 
-  const [editData, setEditData] = useState(userData);
+  const [editData, setEditData] = useState({});
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      if (!user.id) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiUrl}/api/usuarios/${user.id}`, { credentials: 'include' });
+
+        if (response.ok) {
+          const data = await response.json();
+          const profile = data.data || data;
+          
+          const formattedData = {
+            nome: profile.nome || '',
+            email: profile.email || '',
+            telefone: profile.telefone || '',
+            endereco: profile.endereco || '',
+            cidade: profile.cidade || '',
+            pais: profile.pais || '',
+            cep: profile.cep || '',
+          };
+
+          setUserData(formattedData);
+          setEditData(formattedData);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar perfil:', error);
+        toastError('Erro ao carregar dados do perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate, apiUrl]);
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -26,16 +70,53 @@ function Profile() {
     }));
   };
 
-  const handleSave = () => {
-    setUserData(editData);
-    setIsEditing(false);
-    // TODO: Integrar com API para salvar dados
+  const handleSave = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      const response = await fetch(`${apiUrl}/api/usuarios/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(editData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUserData(editData);
+        setIsEditing(false);
+        toastSuccess('Perfil atualizado com sucesso!');
+        
+        // Atualizar localStorage
+        const updatedUser = { ...user, ...editData };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } else {
+        throw new Error(data.message || 'Erro ao atualizar perfil');
+      }
+    } catch (error) {
+      toastError(error.message);
+    }
   };
 
   const handleCancel = () => {
     setEditData(userData);
     setIsEditing(false);
   };
+
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div>

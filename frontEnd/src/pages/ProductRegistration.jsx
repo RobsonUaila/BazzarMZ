@@ -3,14 +3,17 @@ import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import { toastError, toastSuccess } from '../utils/toast';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function ProductRegistration() {
+  const { id } = useParams(); // Pega o ID da URL se estiver editando
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
   const [gridImagePreview, setGridImagePreview] = useState('');
   const [gifFiles, setGifFiles] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     nome: '',
     descricao: '',
@@ -23,12 +26,38 @@ function ProductRegistration() {
     imagem: null
   });
 
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
     }
-  }, [navigate]);
+
+    // Se tiver ID, busca os dados do produto para editar
+    if (id) {
+      fetchProductData(id);
+    }
+  }, [navigate, id]);
+
+  const fetchProductData = async (productId) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/produtos/${productId}`);
+      const data = await response.json();
+      if (data.success) {
+        const prod = data.data;
+        setFormData({
+          nome: prod.nome,
+          descricao: prod.descricao.replace(/<br \/>/g, '\n'), // Converte HTML de volta para texto
+          preco: prod.preco,
+          categoria: prod.categoria,
+          estoque: prod.estoque
+        });
+      }
+    } catch (error) {
+      toastError('Erro ao carregar dados do produto');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,16 +96,15 @@ function ProductRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setUploadProgress(0);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
+      const user = localStorage.getItem('user');
+      if (!user) {
         toastError("Você precisa estar logado para realizar esta ação.");
         navigate('/login');
         return;
       }
-
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
       // Usar FormData para envio de arquivos
       const data = new FormData();
@@ -86,6 +114,7 @@ function ProductRegistration() {
       data.append('categoria', formData.categoria);
       data.append('estoque', formData.estoque);
 
+      // Só anexa imagens se o usuário selecionou novas
       if (files.imagem_capa) data.append('imagem_capa', files.imagem_capa);
       if (files.imagem) data.append('imagem', files.imagem);
 
@@ -93,25 +122,30 @@ function ProductRegistration() {
         data.append('gifs', gif);
       });
 
-      const response = await fetch(`${apiUrl}/api/produtos`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }, // Não setar Content-Type com FormData
-        body: data
+      const url = id ? `${apiUrl}/api/produtos/${id}` : `${apiUrl}/api/produtos`;
+      
+      const response = await axios({
+        method: id ? 'put' : 'post',
+        url: url,
+        data: data,
+        withCredentials: true, // Envia o cookie HttpOnly
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        }
       });
 
-      const result = await response.json();
+      const result = response.data;
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Erro ao cadastrar produto');
-      }
 
-      toastSuccess('Produto cadastrado com sucesso!');
+      toastSuccess(id ? 'Produto atualizado com sucesso!' : 'Produto cadastrado com sucesso!');
       navigate('/admin/dashboard');
     } catch (error) {
       console.error(error);
       toastError(error.message || "Erro ao conectar com o servidor");
     } finally {
       setLoading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -128,7 +162,7 @@ function ProductRegistration() {
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-8">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastrar Novo Produto</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-6">{id ? 'Editar Produto' : 'Cadastrar Novo Produto'}</h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -207,22 +241,6 @@ function ProductRegistration() {
                   )}
                 </div>
 
-                {/* Descrição de Texto */}
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descrição de Texto *
-                  </label>
-                  <textarea
-                    name="descricao"
-                    rows="4"
-                    required
-                    value={formData.descricao}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="Descreva detalhes do produto, características, material, etc."
-                  />
-                </div>
-
                 {/* Fotografia de Capa */}
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -232,7 +250,7 @@ function ProductRegistration() {
                     type="file"
                     name="imagem_capa"
                     accept="image/*"
-                    required
+                    required={!id} // Não é obrigatório na edição
                     onChange={handleFileChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   />
@@ -259,7 +277,7 @@ function ProductRegistration() {
                     type="file"
                     name="imagem"
                     accept="image/*"
-                    required
+                    required={!id} // Não é obrigatório na edição
                     onChange={handleFileChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   />
@@ -324,6 +342,8 @@ function ProductRegistration() {
                     <option value="Higiene e limpeza">Higiene e limpeza</option>
                     <option value="Acessórios">Acessorios</option>
                     <option value="Casa">Casa</option>
+                    <option value="vestuario">Vestuario</option>
+                    <option value="Diversos">Diversos</option>
                   </select>
                 </div>
               </div>
@@ -340,6 +360,18 @@ function ProductRegistration() {
                 </ul>
               </div>
 
+              {/* Barra de Progresso */}
+              {loading && uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden">
+                  <div 
+                    className="bg-blue-600 h-4 rounded-full transition-all duration-300 ease-out flex items-center justify-center text-xs text-white font-bold" 
+                    style={{ width: `${uploadProgress}%` }}
+                  >
+                    {uploadProgress}%
+                  </div>
+                </div>
+              )}
+
               {/* Botão Enviar */}
               <div className="pt-4 flex gap-4">
                 <button
@@ -350,7 +382,7 @@ function ProductRegistration() {
                   {loading ? 'Salvando...' : (
                     <>
                       <Save size={20} className="mr-2" />
-                      Publicar Produto
+                      {id ? 'Atualizar Produto' : 'Publicar Produto'}
                     </>
                   )}
                 </button>

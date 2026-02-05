@@ -7,18 +7,28 @@ import { useTheme } from "../contexts/themeContext";
 function Navbar() {
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
-    const [cart, setCart] = useState([]);
-    const [user, setUser] = useState(null);
+    const getStoredUser = () => {
+        try {
+            const storedUser = localStorage.getItem('user');
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch {
+            return null;
+        }
+    };
+    const getStoredCart = () => {
+        try {
+            return JSON.parse(localStorage.getItem('cart') || '[]');
+        } catch {
+            return [];
+        }
+    };
+    const [cart, setCart] = useState(getStoredCart);
+    const [user, setUser] = useState(getStoredUser);
     const { theme, toggleTheme } = useTheme();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        
-        const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        setCart(savedCart);
+        setUser(getStoredUser());
+        setCart(getStoredCart());
     }, []);
 
     const handleLogout = () => {
@@ -33,7 +43,7 @@ function Navbar() {
         <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    <div className="flex-shrink-0 flex items-center">
+                    <div className="shrink-0 flex items-center">
                         <Link to="/" className="text-2xl font-bold text-gray-900 dark:text-white">BazzarMZ</Link>
                     </div>
 
@@ -83,6 +93,7 @@ function Navbar() {
                         <div className="md:hidden flex items-center">
                             <button
                                 onClick={() => setMenuOpen(!menuOpen)}
+                                aria-label="Abrir menu"
                                 className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-2"
                             >
                                 {menuOpen ? <X size={24} /> : <Menu size={24} />}

@@ -115,7 +115,7 @@ function SearchPage() {
                   <div>
                     <h3 className="font-semibold mb-3">Categoria</h3>
                     <div className="space-y-2">
-                      {['Vestuário', 'Calçados', 'Acessórios', 'Eletrônicos'].map(cat => (
+                      {['Vestuário','Higiene e Limpeza','Cosmeticos','Acessórios','Diversos','Casa'].map(cat => (
                         <label key={cat} className="flex items-center cursor-pointer">
                           <input
                             type="radio"

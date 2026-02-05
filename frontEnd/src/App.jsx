@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { lazy, Suspense } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AnimatePresence, motion} from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ThemerProvider, useTheme } from './contexts/themeContext';
 
 
@@ -33,7 +33,9 @@ const Favorites = lazy(() => import('./pages/Favorites'));
 const ProductList = lazy(() => import('./pages/ProductList'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const PolicyPage = lazy(() => import('./pages/PolicyPage'));
-
+const AdminProducts = lazy(() => import('./pages/AdminProducts'));
+const AdminOrders = lazy(() => import('./pages/AdminOrders'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
 
 // Componente que renderiza o conteúdo principal da aplicação
 function AppContent() {
@@ -85,26 +87,30 @@ function AppContent() {
               }
             />
 
-            {/* ===== PÁGINAS DE AUTENTICAÇÃO ===== */}
+            {/*  PÁGINAS DE AUTENTICAÇÃO  */}
+
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/product-registration" element={<ProductRegistration />} />
-            
-            {/* ===== PÁGINAS DE PRODUTOS ===== */}
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path='/product-edit/:id' element={<AnimatedRoute><ProductRegistration /></AnimatedRoute>}/>
+            <Route path="/admin/orders" element={<AnimatedRoute><AdminOrders /></AnimatedRoute>} />
+            <Route path="/admin/users" element={<AnimatedRoute><AdminUsers /></AnimatedRoute>} />
+            {/*  PÁGINAS DE USUÁRIO */}
+            <Route path="/profile" element={<AnimatedRoute><Profile /></AnimatedRoute>} />
+            {/* PÁGINAS DE PRODUTOS */}
             <Route path="/produtos" element={<AnimatedRoute><ProductList /></AnimatedRoute>} />
             <Route path="/produto/:id" element={<AnimatedRoute><ProductDetail /></AnimatedRoute>} />
-            
-            {/* ===== PÁGINAS DE USUÁRIO ===== */}
-            <Route path="/profile" element={<AnimatedRoute><Profile /></AnimatedRoute>} />
+             
             <Route path="/favorites" element={<AnimatedRoute><Favorites /></AnimatedRoute>} />
 
-            {/* ===== PÁGINAS DE COMPRA ===== */}
+            {/* PÁGINAS DE COMPRA  */}
             <Route path="/search" element={<AnimatedRoute><SearchPage /></AnimatedRoute>} />
             <Route path="/checkout" element={<AnimatedRoute><Checkout /></AnimatedRoute>} />
             <Route path="/orders" element={<AnimatedRoute><Orders /></AnimatedRoute>} />
 
-            {/* ===== PÁGINAS INFORMATIVAS ===== */}
+            {/* PÁGINAS INFORMATIVAS */}
             <Route path="/politicas" element={<PolicyPage title="Políticas de Privacidade e Envios" />} />
             <Route path="/termos" element={<PolicyPage title="Termos de Serviço" />} />
             <Route path="/ajuda" element={<PolicyPage title="Central de Ajuda (FAQ)" />} />

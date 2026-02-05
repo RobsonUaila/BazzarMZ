@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
+import { toastError, toastSuccess } from '../utils/toast';
 
 function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    telefone: '',
     senha: '',
     confirmaSenha: '',
   });
@@ -44,26 +45,33 @@ function Register() {
     setLoading(true);
 
     try {
-      // TODO: Integrar com API
-      // const response = await fetch('http://localhost:3000/api/usuarios/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     nome: formData.nome,
-      //     email: formData.email,
-      //     telefone: formData.telefone,
-      //     senha: formData.senha
-      //   })
-      // });
-      // const data = await response.json();
-      // if (response.ok) {
-      //   setSuccess('Conta criada com sucesso! Redirecionando...');
-      //   setTimeout(() => window.location.href = '/login', 2000);
-      // }
-      console.log('Register:', formData);
-      setSuccess('Conta criada com sucesso!');
-    } catch  {
-      setError('Erro ao criar conta. Tente novamente.');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/api/usuarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: formData.nome.trim(),
+          email: formData.email.trim(),
+          senha: formData.senha,
+          role: 'user' // Adiciona o role padrão para novos usuários
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toastSuccess('Conta criada com sucesso! Redirecionando...');
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        console.error('Erro detalhado do servidor:', data);
+        // Suporta mensagens simples ou arrays de erro (comum em validações de backend)
+        const errorMessage = data.message || (data.errors && Array.isArray(data.errors) ? data.errors.map(e => e.msg || e.message).join(', ') : 'Erro de validação ao criar conta');
+        throw new Error(errorMessage);
+      }
+    } catch (err) {
+      const errorMessage = err.message || 'Erro ao criar conta. Tente novamente.';
+      setError(errorMessage);
+      toastError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -121,24 +129,6 @@ function Register() {
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="seu@email.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Telefone
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-3 text-gray-400" size={20} />
-                <input
-                  type="tel"
-                  name="telefone"
-                  required
-                  value={formData.telefone}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  placeholder="(+258) 84 123 4567"
                 />
               </div>
             </div>

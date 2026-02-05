@@ -68,5 +68,31 @@ describe('Endpoints de Pedidos - /pedidos', () => {
       expect(response.body.data[0].idusuarios).toBe(userId);
     });
   });
-  // Adicionar mais testes para POST, GET by ID, PUT, DELETE
+
+  describe('POST /pedidos', () => {
+    it('deve criar um novo pedido de teste com sucesso', async () => {
+      // 1. Preparação: Garantir que existe um produto (ID 999) para o teste
+      await db.query(`
+        INSERT INTO produtos (id, nome, descricao, preco, estoque, categoria, criado_em) 
+        VALUES (999, 'Produto Teste Auto', 'Descrição Teste', 100.00, 50, 'Teste', NOW()) 
+        ON DUPLICATE KEY UPDATE estoque = 50
+      `);
+
+      // 2. Execução: Enviar requisição para criar o pedido
+      const response = await request(app)
+        .post('/pedidos')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          items: [{ id: 999, quantity: 1 }],
+          nome_cliente: 'Cliente Teste Automatizado',
+          telefone: '+258 84 000 0000',
+          endereco: 'Av. de Testes, 123, Maputo'
+        });
+
+      // 3. Verificação
+      expect(response.statusCode).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(response.body.pedidoId).toBeDefined();
+    });
+  });
 });

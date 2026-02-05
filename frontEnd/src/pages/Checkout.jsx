@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { ShoppingCart, MapPin, Truck, AlertCircle, CheckCircle2, Phone, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
+import { toastError, toastSuccess } from '../utils/toast';
 
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
@@ -10,6 +11,7 @@ function Checkout() {
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (savedCart.length === 0) navigate('/produtos');
     setCartItems(savedCart);
   }, []);
 
@@ -80,11 +82,49 @@ function Checkout() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const sendToWhatsApp = (e) => {
+  const sendToWhatsApp = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
+    }
+
+    // 1. Salvar pedido no banco de dados
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toastError("Você precisa estar logado para fazer um pedido.");
+        return;
+      }
+
+      // SEGURANÇA: O Backend deve recalcular este total baseando-se nos IDs dos itens.
+      // Confiar no total enviado pelo frontend permite manipulação de preços.
+      if (total <= 0) {
+        toastError("Erro no cálculo do pedido.");
+        return;
+      }
+
+      const orderData = {
+        items: cartItems,
+        total: total,
+        nome_cliente: formData.Nome_do_Cliente,
+        telefone: formData.numero_chamadas,
+        endereco: formData.endereco_completo,
+      };
+
+      const response = await fetch(`${apiUrl}/api/pedidos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(orderData),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || 'Falha ao criar pedido');
+
+      toastSuccess('Pedido registado no sistema!');
+    } catch (error) {
+      toastError(error.message || 'Não foi possível registar o pedido.');
+      return; // Não continuar se o registo falhar
     }
 
     // Construir mensagem para WhatsApp
@@ -126,6 +166,7 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
 
     // Mostrar confirmação
     setSubmitted(true);
+    localStorage.removeItem('cart'); // Limpar carrinho
     
     // Resetar formulário após 3 segundos
     setTimeout(() => {
@@ -136,6 +177,7 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
         confirmacao: false,
       });
       setSubmitted(false);
+      navigate('/orders'); // Leva para a página de pedidos
     }, 3000);
   };
 

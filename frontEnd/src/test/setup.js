@@ -1,11 +1,18 @@
 import '@testing-library/jest-dom';
 
-// Mock localStorage
+// Mock localStorage with in-memory store
+const localStorageStore = {};
 const localStorageMock = {
-  getItem: () => null,
-  setItem: () => {},
-  removeItem: () => {},
-  clear: () => {}
+  getItem: (key) => (key in localStorageStore ? localStorageStore[key] : null),
+  setItem: (key, value) => {
+    localStorageStore[key] = String(value);
+  },
+  removeItem: (key) => {
+    delete localStorageStore[key];
+  },
+  clear: () => {
+    Object.keys(localStorageStore).forEach((key) => delete localStorageStore[key]);
+  }
 };
 
 global.localStorage = localStorageMock;
