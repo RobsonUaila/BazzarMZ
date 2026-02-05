@@ -43,8 +43,16 @@ const AdminProducts = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja apagar este produto?')) {
       try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          toastError('Sessão expirada. Faça login novamente.');
+          navigate('/login');
+          return;
+        }
+
         const response = await fetch(`${apiUrl}/api/produtos/${id}`, {
           method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` },
           credentials: 'include'
         });
         
@@ -54,7 +62,13 @@ const AdminProducts = () => {
           toastSuccess('Produto apagado com sucesso!');
           setProducts(products.filter(p => p.id !== id));
         } else {
-          toastError(data.message || 'Erro ao apagar produto');
+          if (response.status === 401) {
+            localStorage.removeItem('token');
+            toastError('Sessão expirada. Faça login novamente.');
+            navigate('/login');
+          } else {
+            toastError(data.message || 'Erro ao apagar produto');
+          }
         }
       } catch (error) {
         console.error('Erro:', error);
