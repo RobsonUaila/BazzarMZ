@@ -42,14 +42,14 @@ const ErrorResponse = require('../utils/ErrorResponse');
 router.get('/', auth, (req, res, next) => {
     const usuarioId = req.user.id;
     const sql = `
-        SELECT p.id, p.data_pedido, p.status, p.total, p.trackingNumber,
+        SELECT p.idPedidos as id, p.data as data_pedido, p.status, p.total, NULL as trackingNumber,
                JSON_ARRAYAGG(JSON_OBJECT('name', prod.nome, 'quantity', ip.quantidade, 'price', ip.preco_unitario)) as items
         FROM pedidos p
-        JOIN itens_pedidos ip ON p.id = ip.pedido_id
+        JOIN itens_pedidos ip ON p.idPedidos = ip.pedidos_id
         JOIN produtos prod ON ip.produto_id = prod.id
-        WHERE p.usuario_id = ?
-        GROUP BY p.id
-        ORDER BY p.data_pedido DESC
+        WHERE p.idusuarios = ?
+        GROUP BY p.idPedidos, p.data, p.status, p.total
+        ORDER BY p.data DESC
     `;
     pool.query(sql, [usuarioId], (err, results) => {
         if (err) return next(new ErrorResponse('Erro ao buscar seus pedidos', 500));
@@ -61,14 +61,14 @@ router.get('/', auth, (req, res, next) => {
 router.get('/my-orders', auth, (req, res, next) => {
     const idusuarios = req.user.id;
     const sql = `
-        SELECT p.id, p.data_pedido, p.status, p.total, p.trackingNumber,
+        SELECT p.idPedidos as id, p.data as data_pedido, p.status, p.total, NULL as trackingNumber,
                JSON_ARRAYAGG(JSON_OBJECT('name', prod.nome, 'quantity', ip.quantidade, 'price', ip.preco_unitario)) as items
         FROM pedidos p
-        JOIN itens_pedidos ip ON p.id = ip.pedido_id
+        JOIN itens_pedidos ip ON p.idPedidos = ip.pedidos_id
         JOIN produtos prod ON ip.produto_id = prod.id
-        WHERE p.usuario_id = ?
-        GROUP BY p.id
-        ORDER BY p.data_pedido DESC
+        WHERE p.idusuarios = ?
+        GROUP BY p.idPedidos, p.data, p.status, p.total
+        ORDER BY p.data DESC
     `;
     pool.query(sql, [idusuarios], (err, results) => {
         if (err) return next(new ErrorResponse('Erro ao buscar seus pedidos', 500));
@@ -80,10 +80,11 @@ router.get('/my-orders', auth, (req, res, next) => {
 router.get('/all', auth, authorize('admin'), (req, res, next) => {
     const sql = `
         SELECT 
-            p.id, p.data_pedido, p.status, p.total,
-            p.nome_cliente, p.telefone, p.endereco
+            p.idPedidos as id, p.data as data_pedido, p.status, p.total,
+            u.nome as nome_cliente, NULL as telefone, NULL as endereco
         FROM pedidos p
-        ORDER BY p.data_pedido DESC
+        JOIN usuarios u ON p.idusuarios = u.idusuarios
+        ORDER BY p.data DESC
     `;
     pool.query(sql, (err, pedidos) => {
         if (err) {
@@ -122,7 +123,7 @@ router.get('/all', auth, authorize('admin'), (req, res, next) => {
  *         description: Pedido não encontrado.
  */
 router.get('/:id', auth, (req, res, next) => {
-    const sql = 'SELECT * FROM pedidos WHERE id = ?';
+    const sql = 'SELECT * FROM pedidos WHERE idPedidos = ?';
     pool.query(sql, [req.params.id], (err, results) => {
         if (err) return next(new ErrorResponse('Erro ao buscar pedido', 500));
         if (results.length === 0) return next(new ErrorResponse('Pedido não encontrado', 404));
@@ -159,6 +160,10 @@ router.get('/:id', auth, (req, res, next) => {
 router.post('/', optionalAuth, (req, res, next) => { // Rota para criar um novo pedido (login opcional)
     const { items, nome_cliente, telefone, endereco } = req.body;
     const usuario_id = req.user?.id || req.usuario?.id || null;
+
+    if (!usuario_id) {
+        return next(new ErrorResponse('UsuÃ¡rio nÃ£o autenticado para criar pedido.', 401));
+    }
 
     // Validação inicial
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -215,8 +220,8 @@ router.post('/', optionalAuth, (req, res, next) => { // Rota para criar um novo 
                 }
 
                 // 1. Insere o pedido com o total calculado no servidor
-                const pedidoSql = `INSERT INTO pedidos (usuario_id, total, status, nome_cliente, telefone, endereco, data_pedido) VALUES (?, ?, 'processando', ?, ?, ?, NOW())`;
-                connection.query(pedidoSql, [usuario_id, serverTotal, nome_cliente, telefone, endereco], (err, results) => {
+                const pedidoSql = `INSERT INTO pedidos (idusuarios, total, status, data) VALUES (?, ?, 'processando', NOW())`;
+                connection.query(pedidoSql, [usuario_id, serverTotal], (err, results) => {
                     if (err) {
                         return connection.rollback(() => {
                             connection.release();
@@ -227,7 +232,7 @@ router.post('/', optionalAuth, (req, res, next) => { // Rota para criar um novo 
                     const pedidoId = results.insertId;
 
                     // 2. Insere os itens do pedido com os preços corretos do banco de dados
-                    const itensSql = 'INSERT INTO itens_pedidos (pedido_id, produto_id, quantidade, preco_unitario) VALUES ?';
+                    const itensSql = 'INSERT INTO itens_pedidos (pedidos_id, produto_id, quantidade, preco_unitario) VALUES ?';
                     const itensValues = finalItemsForInsert.map(itemData => [pedidoId, ...itemData]);
 
                     connection.query(itensSql, [itensValues], (err, results) => {
@@ -317,7 +322,7 @@ router.put('/:id/status', auth, authorize('admin'), (req, res, next) => {
         return next(new ErrorResponse('Status fornecido é inválido', 400));
     }
 
-    const sql = 'UPDATE pedidos SET status = ? WHERE id = ?';
+    const sql = 'UPDATE pedidos SET status = ? WHERE idPedidos = ?';
     pool.query(sql, [status, id], (err, results) => {
         if (err) return next(new ErrorResponse('Erro ao atualizar status do pedido', 500));
         if (results.affectedRows === 0) return next(new ErrorResponse('Pedido não encontrado', 404));
@@ -350,7 +355,7 @@ router.put('/:id/status', auth, authorize('admin'), (req, res, next) => {
  *         description: Pedido não encontrado.
  */
 router.delete('/:id', auth, authorize('admin'), (req, res, next) => {
-    const sql = 'DELETE FROM pedidos WHERE id = ?';
+    const sql = 'DELETE FROM pedidos WHERE idPedidos = ?';
     pool.query(sql, [req.params.id], (err, results) => {
         if (err) return next(new ErrorResponse('Erro ao deletar pedido', 500));
         if (results.affectedRows === 0) return next(new ErrorResponse('Pedido não encontrado', 404));

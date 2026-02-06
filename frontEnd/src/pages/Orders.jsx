@@ -23,7 +23,9 @@ function Orders() {
       }
 
       try {
-        const response = await fetch(`${apiUrl}/api/pedidos/my-orders`, { credentials: 'include' });
+        const response = await fetch(`${apiUrl}/api/pedidos/my-orders`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
 
         if (response.status === 401) {
           localStorage.removeItem('token');
