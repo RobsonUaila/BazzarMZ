@@ -33,16 +33,16 @@ function ProductList() {
     setLoading(true);
     try {
       let url = `${apiUrl}/api/produtos?page=${currentPage}&limit=${productsPerPage}`;
-      
+
       if (searchTerm) url += `&search=${searchTerm}`;
       if (category) url += `&categoria=${category}`;
 
       const response = await fetch(url);
-      
+
       if (!response.ok) throw new Error('Erro ao carregar produtos');
-      
+
       const data = await response.json();
-      
+
       // Ajuste para estrutura do backend: { success: true, data: [...], pagination: {...} }
       // Garante que pegamos o array, seja em data.data, data.produtos ou no próprio data
       const listaProdutos = (data.data && Array.isArray(data.data)) ? data.data : (data.produtos && Array.isArray(data.produtos) ? data.produtos : (Array.isArray(data) ? data : []));
@@ -148,8 +148,11 @@ function ProductList() {
               >
                 <option value="">Todas as categorias</option>
                 <option value="Vestuário">Vestuário</option>
-                <option value="Calçados">Calçados</option>
+                <option value="Casa">Casa</option>
                 <option value="Acessórios">Acessórios</option>
+                <option value="Higiene e Limpeza">Higiene e Limpeza</option>
+                <option value="Cosmeticos">Cosmeticos</option>
+                <option value="Diversos">Diversos</option>
               </select>
             </div>
             <div className="flex items-end">
@@ -259,11 +262,10 @@ function ProductList() {
                     <button
                       key={i + 1}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`px-4 py-2 rounded-lg font-semibold transition ${
-                        currentPage === i + 1
+                      className={`px-4 py-2 rounded-lg font-semibold transition ${currentPage === i + 1
                           ? 'bg-blue-600 text-white'
                           : 'border border-gray-300 hover:bg-gray-100'
-                      }`}
+                        }`}
                     >
                       {i + 1}
                     </button>

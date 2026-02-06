@@ -53,6 +53,7 @@ function Navbar() {
                         <Link to="/produtos" className="text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white rounded-full p-2">Higiene e Limpeza</Link>
                         <Link to="/produtos" className="text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white rounded-full p-2">Acessórios</Link>
                         <Link to="/produtos" className="text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white rounded-full p-2">Casa</Link>
+                        <Link to="/produtos" className="text-gray-700 dark:text-gray-300 hover:bg-gray-500 hover:text-white rounded-full p-2">Vestuario</Link>
 
                     </nav>
 
