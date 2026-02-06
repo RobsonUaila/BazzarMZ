@@ -64,16 +64,7 @@ function Footer() {
                             <li>
                                 <Link to="/search" className="hover:text-white transition">Buscar</Link>
                             </li>
-                            {user && (
-                                <>
-                                    <li>
-                                        <Link to="/profile" className="hover:text-white transition">Meu Perfil</Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/orders" className="hover:text-white transition">Meus Pedidos</Link>
-                                    </li>
-                                </>
-                            )}
+                           
                         </ul>
                     </div>
 

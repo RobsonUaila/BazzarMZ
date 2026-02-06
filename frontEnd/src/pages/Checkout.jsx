@@ -155,7 +155,7 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
 *Status:* Aguardando Confirmação`;
 
     // Número de WhatsApp da loja (adicione seu número aqui)
-    const numeroWhatsApp = 'https://wa.me/258835130967'; // Substitua pelo número real da loja
+    const numeroWhatsApp = '258835130967'; // Substitua pelo número real da loja
 
     // Codificar mensagem para URL
     const mensagemCodificada = encodeURIComponent(mensagem);

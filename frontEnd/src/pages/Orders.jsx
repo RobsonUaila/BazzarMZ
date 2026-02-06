@@ -12,6 +12,10 @@ function Orders() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const toNumber = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  };
 
   useEffect(() => {
     const fetchUserOrders = async () => {
@@ -111,12 +115,13 @@ function Orders() {
     const tableColumn = ["Produto", "Qtd", "Preço Unit.", "Subtotal"];
     const tableRows = [];
 
-    order.items.forEach(item => {
+    (order.items || []).forEach(item => {
+      const price = toNumber(item.price);
       const itemData = [
         item.name,
         item.quantity,
-        `MT ${item.price.toFixed(2)}`,
-        `MT ${(item.price * item.quantity).toFixed(2)}`
+        `MT ${price.toFixed(2)}`,
+        `MT ${(price * item.quantity).toFixed(2)}`
       ];
       tableRows.push(itemData);
     });
@@ -133,7 +138,7 @@ function Orders() {
     const finalY = doc.lastAutoTable.finalY + 10;
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text(`Total Geral: MT ${order.total.toFixed(2)}`, 140, finalY);
+    doc.text(`Total Geral: MT ${toNumber(order.total).toFixed(2)}`, 140, finalY);
 
     // Rodapé
     doc.setFontSize(10);
@@ -196,13 +201,13 @@ function Orders() {
                       <div className="p-6 border-b border-gray-200">
                         <h3 className="font-semibold mb-4">Produtos</h3>
                         <div className="space-y-3">
-                          {order.items.map((item, idx) => (
+                          {(order.items || []).map((item, idx) => (
                             <div key={idx} className="flex justify-between items-center">
                               <div>
                                 <p className="font-semibold">{item.name}</p>
                                 <p className="text-sm text-gray-600">Quantidade: {item.quantity}</p>
                               </div>
-                              <p className="font-semibold">Mts {item.price.toFixed(2)}</p>
+                              <p className="font-semibold">Mts {toNumber(item.price).toFixed(2)}</p>
                             </div>
                           ))}
                         </div>
@@ -212,7 +217,7 @@ function Orders() {
                       <div className="p-6 bg-gray-50 flex justify-between items-center">
                         <div>
                           <p className="text-gray-600">Total do Pedido</p>
-                          <p className="text-2xl font-bold">Mts {order.total.toFixed(2)}</p>
+                          <p className="text-2xl font-bold">Mts {toNumber(order.total).toFixed(2)}</p>
                         </div>
                         <div className="flex gap-2">
                           <button
