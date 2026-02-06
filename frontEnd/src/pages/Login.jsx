@@ -41,10 +41,14 @@ function Login() {
 
       // Com HttpOnly cookies, o token é salvo automaticamente pelo browser.
       if (data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
+        const normalizedUser = {
+          ...data.user,
+          id: data.user.id ?? data.user.idusuarios
+        };
+        localStorage.setItem('user', JSON.stringify(normalizedUser));
         toastSuccess("Login realizado com sucesso!");
-        
-        if (data.user && data.user.role === 'admin') {
+
+        if (normalizedUser.role === 'admin') {
           navigate('/admin/dashboard');
         } else {
           navigate('/');

@@ -24,33 +24,43 @@ function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-      if (!user.id) {
+      const token = localStorage.getItem('token');
+      if (!token) {
         navigate('/login');
         return;
       }
 
       try {
-        const response = await fetch(`${apiUrl}/api/usuarios/${user.id}`, { credentials: 'include' });
+        const response = await fetch(`${apiUrl}/api/usuarios/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-        if (response.ok) {
-          const data = await response.json();
-          const profile = data.data || data;
-          
-          const formattedData = {
-            nome: profile.nome || '',
-            email: profile.email || '',
-            telefone: profile.telefone || '',
-            endereco: profile.endereco || '',
-            cidade: profile.cidade || '',
-            pais: profile.pais || '',
-            cep: profile.cep || '',
-          };
-
-          setUserData(formattedData);
-          setEditData(formattedData);
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+          return;
         }
+
+        if (!response.ok) {
+          throw new Error('Erro ao buscar perfil');
+        }
+
+        const data = await response.json();
+        const profile = data.data || data;
+
+        const formattedData = {
+          nome: profile.nome || '',
+          email: profile.email || '',
+          telefone: profile.telefone || '',
+          endereco: profile.endereco || '',
+          cidade: profile.cidade || '',
+          pais: profile.pais || '',
+          cep: profile.cep || '',
+        };
+
+        setUserData(formattedData);
+        setEditData(formattedData);
       } catch (error) {
         console.error('Erro ao buscar perfil:', error);
         toastError('Erro ao carregar dados do perfil');
@@ -72,14 +82,18 @@ function Profile() {
 
   const handleSave = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
-      const response = await fetch(`${apiUrl}/api/usuarios/${user.id}`, {
+      const response = await fetch(`${apiUrl}/api/usuarios/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify(editData)
       });
 
@@ -91,6 +105,7 @@ function Profile() {
         toastSuccess('Perfil atualizado com sucesso!');
         
         // Atualizar localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
         const updatedUser = { ...user, ...editData };
         localStorage.setItem('user', JSON.stringify(updatedUser));
       } else {

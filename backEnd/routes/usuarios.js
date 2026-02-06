@@ -106,7 +106,7 @@ router.post('/', asyncHandler(async (req, res, next) => {
 // @route   GET /api/usuarios/me
 // @access  Private
 router.get('/me', auth, asyncHandler(async (req, res, next) => {
-    const sql = 'SELECT id, nome, email, role, data_criacao FROM usuarios WHERE id = ?';
+    const sql = 'SELECT idusuarios as id, nome, email, role FROM usuarios WHERE idusuarios = ?';
     pool.query(sql, [req.user.id], (err, results) => {
         if (err) return next(new ErrorResponse('Erro ao buscar dados do usuÃ¡rio', 500));
         res.status(200).json({
@@ -116,11 +116,48 @@ router.get('/me', auth, asyncHandler(async (req, res, next) => {
     });
 }));
 
+// @desc    Atualizar dados do usuÃ¡rio atual
+// @route   PUT /api/usuarios/me
+// @access  Private
+router.put('/me', auth, asyncHandler(async (req, res, next) => {
+    const { nome, email } = req.body;
+    const updates = [];
+    const values = [];
+
+    if (nome && String(nome).trim()) {
+        updates.push('nome = ?');
+        values.push(String(nome).trim());
+    }
+
+    if (email && String(email).trim()) {
+        updates.push('email = ?');
+        values.push(String(email).trim().toLowerCase());
+    }
+
+    if (updates.length === 0) {
+        return next(new ErrorResponse('Nenhum dado vÃ¡lido para atualizar', 400));
+    }
+
+    const sql = `UPDATE usuarios SET ${updates.join(', ')} WHERE idusuarios = ?`;
+    values.push(req.user.id);
+
+    pool.query(sql, values, (err) => {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                return next(new ErrorResponse('Email jÃ¡ cadastrado', 409));
+            }
+            return next(new ErrorResponse('Erro ao atualizar usuÃ¡rio', 500));
+        }
+
+        res.status(200).json({ success: true, message: 'Perfil atualizado com sucesso' });
+    });
+}));
+
 // @desc    Get all users
 // @route   GET /api/usuarios
 // @access  Private/Admin
 router.get('/', auth, authorize('admin'), asyncHandler(async (req, res, next) => {
-    const sql = 'SELECT id, nome, email, role, data_criacao FROM usuarios ORDER BY data_criacao DESC';
+    const sql = 'SELECT idusuarios as id, nome, email, role FROM usuarios ORDER BY idusuarios DESC';
     pool.query(sql, (err, results) => {
         if (err) {
             return next(new ErrorResponse('Erro ao buscar usuÃ¡rios', 500));
@@ -144,7 +181,7 @@ router.put('/:id/role', auth, authorize('admin'), asyncHandler(async (req, res, 
         return next(new ErrorResponse('Cargo invÃ¡lido', 400));
     }
 
-    const sql = 'UPDATE usuarios SET role = ? WHERE id = ?';
+    const sql = 'UPDATE usuarios SET role = ? WHERE idusuarios = ?';
     pool.query(sql, [role, id], (err, result) => {
         if (err) {
             return next(new ErrorResponse('Erro ao atualizar cargo do usuÃ¡rio', 500));
@@ -166,7 +203,7 @@ router.delete('/:id', auth, authorize('admin'), asyncHandler(async (req, res, ne
         return next(new ErrorResponse('VocÃª nÃ£o pode apagar sua prÃ³pria conta de administrador.', 400));
     }
 
-    const sql = 'DELETE FROM usuarios WHERE id = ?';
+    const sql = 'DELETE FROM usuarios WHERE idusuarios = ?';
     pool.query(sql, [id], (err, result) => {
         if (err) {
             if (err.code === 'ER_ROW_IS_REFERENCED_2') {
