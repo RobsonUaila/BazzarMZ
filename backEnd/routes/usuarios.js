@@ -235,8 +235,8 @@ router.post('/forgotpassword', asyncHandler(async (req, res, next) => {
         const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
         const expireDate = Date.now() + 10 * 60 * 1000; // 10 minutos
 
-        const updateSql = 'UPDATE usuarios SET resetPasswordToken = ?, resetPasswordExpire = ? WHERE id = ?';
-        pool.query(updateSql, [hashedToken, new Date(expireDate), user.id], async (err, result) => {
+        const updateSql = 'UPDATE usuarios SET resetPasswordToken = ?, resetPasswordExpire = ? WHERE idusuarios = ?';
+        pool.query(updateSql, [hashedToken, new Date(expireDate), user.idusuarios], async (err, result) => {
             if (err) return next(new ErrorResponse('Erro ao salvar token de reset', 500));
 
             // CORREÃ‡ÃƒO: A URL deve apontar para o frontend.
@@ -260,7 +260,7 @@ router.post('/forgotpassword', asyncHandler(async (req, res, next) => {
                 res.status(200).json({ success: true, data: 'Email enviado' });
             } catch (emailError) {
                 console.error(emailError);
-                pool.query('UPDATE usuarios SET resetPasswordToken = NULL, resetPasswordExpire = NULL WHERE id = ?', [user.id]);
+                pool.query('UPDATE usuarios SET resetPasswordToken = NULL, resetPasswordExpire = NULL WHERE idusuarios = ?', [user.idusuarios]);
                 return next(new ErrorResponse('NÃ£o foi possÃ­vel enviar o email', 500));
             }
         });
@@ -283,8 +283,8 @@ router.put('/resetpassword/:resettoken', asyncHandler(async (req, res, next) => 
         const salt = await bcrypt.genSalt(10);
         const newHashedPassword = await bcrypt.hash(senha, salt);
 
-        const updateSql = 'UPDATE usuarios SET senha = ?, resetPasswordToken = NULL, resetPasswordExpire = NULL WHERE id = ?';
-        pool.query(updateSql, [newHashedPassword, user.id], (err, result) => {
+        const updateSql = 'UPDATE usuarios SET senha = ?, resetPasswordToken = NULL, resetPasswordExpire = NULL WHERE idusuarios = ?';
+        pool.query(updateSql, [newHashedPassword, user.idusuarios], (err, result) => {
             if (err) return next(new ErrorResponse('Erro ao redefinir a senha', 500));
             sendTokenResponse(user, 200, res);
         });
@@ -292,4 +292,3 @@ router.put('/resetpassword/:resettoken', asyncHandler(async (req, res, next) => 
 }));
 
 module.exports = router;
-

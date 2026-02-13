@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import { toastError, toastSuccess } from '../utils/toast';
-import { ArrowLeft, Save, Plus, X } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, Loader2 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -79,12 +79,18 @@ function ProductRegistration() {
   };
 
   const handleGifChange = (e) => {
-    const newFiles = Array.from(e.target.files);
+    const newFiles = Array.from(e.target.files).map(file => ({
+      file,
+      id: Math.random().toString(36).substr(2, 9), // ID único para o React
+      preview: URL.createObjectURL(file) // URL persistente
+    }));
     setGifFiles(prev => [...prev, ...newFiles]);
     toastSuccess(`${newFiles.length} GIF(s) adicionado(s)!`);
   };
 
   const removeGif = (index) => {
+    const item = gifFiles[index];
+    if (item && item.preview) URL.revokeObjectURL(item.preview); // Limpa memória
     setGifFiles(gifFiles.filter((_, i) => i !== index));
   };
 
@@ -98,6 +104,13 @@ function ProductRegistration() {
     setLoading(true);
     setUploadProgress(0);
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toastError("Você precisa estar logado para realizar esta ação.");
+      navigate('/login');
+      return;
+    }
+  
     try {
       const user = localStorage.getItem('user');
       if (!user) {
@@ -118,8 +131,8 @@ function ProductRegistration() {
       if (files.imagem_capa) data.append('imagem_capa', files.imagem_capa);
       if (files.imagem) data.append('imagem', files.imagem);
 
-      gifFiles.forEach((gif) => {
-        data.append('gifs', gif);
+      gifFiles.forEach((item) => {
+        data.append('gifs', item.file);
       });
 
       const url = id ? `${apiUrl}/api/produtos/${id}` : `${apiUrl}/api/produtos`;
@@ -128,6 +141,9 @@ function ProductRegistration() {
         method: id ? 'put' : 'post',
         url: url,
         data: data,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         withCredentials: true, // Envia o cookie HttpOnly
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -217,15 +233,15 @@ function ProductRegistration() {
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                       <p className="text-sm font-semibold text-gray-700 mb-3">GIFs Adicionados:</p>
                       <div className="space-y-3">
-                        {gifFiles.map((gif, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-white rounded border border-gray-300">
+                        {gifFiles.map((item, index) => (
+                          <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded border border-gray-300">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                               <img
-                                src={URL.createObjectURL(gif)}
+                                src={item.preview}
                                 alt="Preview"
                                 className="w-10 h-10 object-cover rounded"
                               />
-                              <p className="text-sm text-gray-600 truncate">{gif.name}</p>
+                              <p className="text-sm text-gray-600 truncate">{item.file.name}</p>
                             </div>
                             <button
                               type="button"
@@ -377,9 +393,14 @@ function ProductRegistration() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Salvando...' : (
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" size={20} />
+                      Salvando...
+                    </>
+                  ) : (
                     <>
                       <Save size={20} className="mr-2" />
                       {id ? 'Atualizar Produto' : 'Publicar Produto'}
