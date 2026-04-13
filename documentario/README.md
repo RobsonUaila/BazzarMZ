@@ -617,7 +617,6 @@ Este projeto é fornecido como está, para uso em e-commerce BazzarMZ.
 
 ---
 
-**Desenvolvido com ❤️ para BazzarMZ**
 
 *Data: 2026-01-16*  
 *Versão: 1.0*  
