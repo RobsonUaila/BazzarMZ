@@ -371,13 +371,13 @@ Endereço de Entrega:
 Rua das Flores, Nº 123, Apto 45, Maputo, Gaza
 
 Produtos:
-- Camiseta Premium (Qtd: 1) - R$ 89.90
-- Tênis Esportivo (Qtd: 1) - R$ 299.90
+- Camiseta Premium (Qtd: 1) - 89.90
+- Tênis Esportivo (Qtd: 1) -  299.90
 
 Resumo do Pedido:
-Subtotal: R$ 389.80
+Subtotal:  389.80
 Frete: Grátis
-Total: R$ 389.80
+Total:  389.80
 
 Método de Pagamento: Dinheiro na Entrega (COD)
 Status: Aguardando Confirmação
