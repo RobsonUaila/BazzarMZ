@@ -20,7 +20,7 @@ function Checkout() {
     if (path.startsWith('http') || path.startsWith('data:')) return path;
     return `${apiUrl}/uploads/images/${path}`;
   };
-  
+
   const [formData, setFormData] = useState({
     Nome_do_Cliente: '',
     numero_chamadas: '',
@@ -58,10 +58,10 @@ function Checkout() {
 
   const validateForm = () => {
     const newErrors = {};
-    if(!formData.Nome_do_Cliente.trim()) {
+    if (!formData.Nome_do_Cliente.trim()) {
       newErrors.Nome_do_Cliente = 'Nome é obrigatório';
     }
-    
+
     if (!formData.numero_chamadas.trim()) {
       newErrors.numero_chamadas = 'Número de chamadas é obrigatório';
     } else if (!/^\+?[0-9\s\-()]{9,9}$/.test(formData.numero_chamadas)) {
@@ -84,7 +84,7 @@ function Checkout() {
 
   const sendToWhatsApp = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -167,11 +167,11 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
     // Mostrar confirmação
     setSubmitted(true);
     localStorage.removeItem('cart'); // Limpar carrinho
-    
+
     // Resetar formulário após 3 segundos
     setTimeout(() => {
       setFormData({
-        Nome_do_Cliente: '', 
+        Nome_do_Cliente: '',
         numero_chamadas: '',
         endereco_completo: '',
         confirmacao: false,
@@ -216,7 +216,7 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                   </div>
 
                   {
-                    /* Nome do Cliente */  
+                    /* Nome do Cliente */
                   }
 
                   <div className="bg-white rounded-lg shadow-md p-6">
@@ -230,13 +230,12 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                         value={formData.Nome_do_Cliente}
                         onChange={handleInputChange}
                         placeholder="Ex: João da Silva"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base ${    
-                          errors.Nome_do_Cliente ? 'border-red-500' : 'border-gray-300'                
-                        }`}                
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base ${errors.Nome_do_Cliente ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
-                        {errors.Nome_do_Cliente && (
-                          <p className="text-red-500 text-sm mt-1">{errors.Nome_do_Cliente}</p>
-                        )}
+                      {errors.Nome_do_Cliente && (
+                        <p className="text-red-500 text-sm mt-1">{errors.Nome_do_Cliente}</p>
+                      )}
                     </div>
                   </div>
 
@@ -257,9 +256,8 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                         value={formData.numero_chamadas}
                         onChange={handleInputChange}
                         placeholder="Ex: +258 84 123 4567"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base ${
-                          errors.numero_chamadas ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base ${errors.numero_chamadas ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.numero_chamadas && (
                         <p className="text-red-500 text-sm mt-1">{errors.numero_chamadas}</p>
@@ -286,9 +284,8 @@ Entrega: ${shipping === 0 ? 'Grátis' : `${shipping.toFixed(2)} Mts`}
                         onChange={handleInputChange}
                         placeholder="Ex: Rua das Flores, Nº 123, Apto 45, Bairro Centro, Maputo, Gaza"
                         rows="4"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base ${
-                          errors.endereco_completo ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-base ${errors.endereco_completo ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.endereco_completo && (
                         <p className="text-red-500 text-sm mt-1">{errors.endereco_completo}</p>

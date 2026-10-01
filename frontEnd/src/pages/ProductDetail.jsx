@@ -321,7 +321,7 @@ function ProductDetail() {
                     <ShoppingCart size={20} />
                     Encomendar Agoraa!
                   </button>
-  
+
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-700 space-y-2">

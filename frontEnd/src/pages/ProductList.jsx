@@ -263,8 +263,8 @@ function ProductList() {
                       key={i + 1}
                       onClick={() => setCurrentPage(i + 1)}
                       className={`px-4 py-2 rounded-lg font-semibold transition ${currentPage === i + 1
-                          ? 'bg-blue-600 text-white'
-                          : 'border border-gray-300 hover:bg-gray-100'
+                        ? 'bg-blue-600 text-white'
+                        : 'border border-gray-300 hover:bg-gray-100'
                         }`}
                     >
                       {i + 1}

@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -16,21 +16,21 @@ const sendTokenResponse = (user, statusCode, res) => {
     });
 
     const options = {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), 
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     };
-    
+
     delete user.senha;
 
     res.status(statusCode)
-       .cookie('token', token, options)
-       .json({
-           success: true,
-           token,
-           user
-       });
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            token,
+            user
+        });
 };
 
 // @desc    Login de usuÃ¡rio

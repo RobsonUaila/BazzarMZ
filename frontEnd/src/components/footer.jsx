@@ -1,114 +1,96 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 
 function Footer() {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-    }, []);
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
-    return (
-        <footer className="bg-gray-900 text-white mt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                    {/* Sobre */}
-                    <div>
-                        <h4 className="font-bold text-lg mb-4">BazzarMZ</h4>
-                        <p className="text-gray-400 mb-4">
-                            Sua loja online com os melhores produtos e os melhores preços.
-                        </p>
-                        <div className="flex gap-4">
-                            <a href="https://www.facebook.com/share/1CHKSfXtRv/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition">
-                                <Facebook size={20} />
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition">
-                                <Twitter size={20} />
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition">
-                                <Instagram size={20} />
-                            </a>
-                        </div>
-                    </div>
+  return (
+    <footer className="bg-primary text-secondary pt-24 pb-12 border-t-4 border-accent">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        
+        {/* Massive Typography Section */}
+        <div className="mb-20 text-center md:text-left relative">
+          <h2 className="text-[12vw] leading-none font-display font-extrabold uppercase tracking-tighter opacity-10 select-none absolute -top-16 left-0">
+            QUICK
+          </h2>
+          <h2 className="text-5xl md:text-8xl font-display font-extrabold uppercase tracking-tighter relative z-10">
+            Mantenha-se <br /> <span className="text-accent">À Frente.</span>
+          </h2>
+        </div>
 
-                    {/* Ajuda */}
-                    <div>
-                        <h4 className="font-bold mb-4">Ajuda</h4>
-                        <ul className="space-y-2 text-gray-400">
-                            <li>
-                                <Link to="/ajuda" className="hover:text-white transition">FAQ</Link>
-                            </li>
-                            <li>
-                                <Link to="/politicas#envio" className="hover:text-white transition">Envios</Link>
-                            </li>
-                            <li>
-                                <Link to="/politicas#devo" className="hover:text-white transition">Devoluções</Link>
-                            </li>
-                            <li>
-                                <Link to="/politicas#garantia" className="hover:text-white transition">Garantia</Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Sobre */}
-                    <div>
-                        <h4 className="font-bold mb-4">Navegação</h4>
-                        <ul className="space-y-2 text-gray-400">
-                            <li>
-                                <Link to="/" className="hover:text-white transition">Início</Link>
-                            </li>
-                            <li>
-                                <Link to="/search" className="hover:text-white transition">Buscar</Link>
-                            </li>
-                           
-                        </ul>
-                    </div>
-
-                    {/* Contacto */}
-                    <div id='contactos'>
-                        <h4 className="font-bold mb-4">Contacte-nos</h4>
-                        <ul className="space-y-3 text-gray-400">
-                            <li className="flex items-center gap-2">
-                                <Mail size={18} />
-                                <a href="mailto:bazzarmzs@gmail.com" className="hover:text-white transition">
-                                    contato@bazarmz.com
-                                </a>
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <Phone size={18} />
-                                <a href="https://wa.me/258835130967" className="hover:text-white transition">
-                                    +258 83 513 0967
-                                </a>
-                            </li>
-                            <li className="flex gap-2">
-                                <MapPin size={18} className="shrink-0" />
-                                <span>Maputo, Moçambique</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-
-                {/* Links Rápidos */}
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 text-sm text-gray-400">
-                    <Link to="/politicas" className="hover:text-white transition">Política de Privacidade</Link>
-                    <Link to="/politicas#termos" className="hover:text-white transition">Termos de Serviço</Link>
-                    <Link to="/politicas#cookies" className="hover:text-white transition">Política de Cookies</Link>
-
-                </div>
-
-                {/* Copyright */}
-                <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-                    <p>&copy; 2024 BazzarMZ. Todos os direitos reservados.</p>
-                    <p className="text-sm mt-2">Desenvolvido por Robson Uaila</p>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 font-sans">
+          {/* Brand Info */}
+          <div className="md:col-span-1">
+            <h4 className="font-display font-bold text-2xl mb-6 uppercase tracking-widest">Quick Sales</h4>
+            <p className="text-secondary/70 mb-8 font-light text-lg">
+              Redefinindo o consumo com curadoria implacável e estética sem concessões.
+            </p>
+            <div className="flex gap-6">
+              <a href="https://www.facebook.com/share/1CHKSfXtRv/" target="_blank" rel="noopener noreferrer" className="text-secondary/50 hover:text-accent transition-colors">
+                <Facebook size={24} />
+              </a>
+              <a href="#" className="text-secondary/50 hover:text-accent transition-colors">
+                <Twitter size={24} />
+              </a>
+              <a href="#" className="text-secondary/50 hover:text-accent transition-colors">
+                <Instagram size={24} />
+              </a>
             </div>
-        </footer>
-    );
+          </div>
+
+          {/* Links */}
+          <div>
+            <h4 className="font-display font-bold text-sm mb-6 uppercase tracking-widest text-secondary/50">Suporte</h4>
+            <ul className="space-y-4 text-lg font-light">
+              <li><Link to="/ajuda" className="hover:text-accent transition-colors relative inline-block group">FAQ<span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent transition-all group-hover:w-full"></span></Link></li>
+              <li><Link to="/politicas#envio" className="hover:text-accent transition-colors relative inline-block group">Envios<span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent transition-all group-hover:w-full"></span></Link></li>
+              <li><Link to="/politicas#devo" className="hover:text-accent transition-colors relative inline-block group">Devoluções<span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent transition-all group-hover:w-full"></span></Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-display font-bold text-sm mb-6 uppercase tracking-widest text-secondary/50">Explorar</h4>
+            <ul className="space-y-4 text-lg font-light">
+              <li><Link to="/" className="hover:text-accent transition-colors relative inline-block group">Início<span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent transition-all group-hover:w-full"></span></Link></li>
+              <li><Link to="/search" className="hover:text-accent transition-colors relative inline-block group">Buscar<span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent transition-all group-hover:w-full"></span></Link></li>
+              <li><Link to="/produtos" className="hover:text-accent transition-colors relative inline-block group">Catálogo<span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent transition-all group-hover:w-full"></span></Link></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-display font-bold text-sm mb-6 uppercase tracking-widest text-secondary/50">Contato</h4>
+            <ul className="space-y-4 text-lg font-light">
+              <li><a href="mailto:contato@QuickSales.com" className="hover:text-accent transition-colors flex items-center gap-3"><Mail size={18} /> contato@QuickSales.com</a></li>
+              <li><a href="https://wa.me/258862996561" className="hover:text-accent transition-colors flex items-center gap-3"><Phone size={18} /> +258 86 299 6561</a></li>
+              <li className="flex gap-3 text-secondary/70"><MapPin size={18} className="shrink-0" /> Maputo, Moçambique</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-secondary/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-light text-secondary/50 uppercase tracking-wider">
+          <div className="flex gap-6">
+            <Link to="/politicas" className="hover:text-accent transition-colors">Privacidade</Link>
+            <Link to="/politicas#termos" className="hover:text-accent transition-colors">Termos</Link>
+            <Link to="/politicas#cookies" className="hover:text-accent transition-colors">Cookies</Link>
+          </div>
+          <div className="text-center md:text-right">
+            <p>&copy; {new Date().getFullYear()} Quick Sales. Todos os direitos reservados.</p>
+            <p className="mt-1">Desenvolvido por Zetix.Labs</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 }
 
 export default Footer;

@@ -35,7 +35,7 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "blob:", "https://bazzarmz-ecommerce.onrender.com", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "https://res.cloudinary.com", "https://*.google.com", "https://*.gstatic.com"],
             scriptSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-inline'", "https://translate.google.com", "https://www.gstatic.com"],
             styleSrc: ["'self'", "https://bazzarmz.shop", "https://www.bazzarmz.shop", "'unsafe-inline'", "https://fonts.googleapis.com", "https://www.gstatic.com"],
-            fontSrc: ["'self'", "https:" ,"data:", "https://fonts.gstatic.com"],
+            fontSrc: ["'self'", "https:", "data:", "https://fonts.gstatic.com"],
             frameAncestors: ["'self'"],
         },
     },

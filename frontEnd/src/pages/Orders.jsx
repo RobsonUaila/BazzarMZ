@@ -43,7 +43,7 @@ function Orders() {
           const fetchedOrders = data.data || [];
           const validOrders = Array.isArray(fetchedOrders) ? fetchedOrders.filter(o => o && (o.id || o._id)) : [];
           setOrders(validOrders);
-        } 
+        }
       } catch (error) {
         console.error(error);
         toastError('Erro de conexão ao buscar pedidos.');
@@ -159,139 +159,139 @@ function Orders() {
           {loading ? (
             <div className="text-center py-10">Carregando seus pedidos...</div>
           ) : orders.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                  <Package size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 text-lg">Você não fez nenhum pedido ainda.</p>
-                  <Link to="/" className="text-blue-600 hover:text-blue-800 font-semibold mt-4 inline-block">
-                    Continuar Comprando
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {orders.map(order => {
-                    const orderId = order.id || order._id;
-                    return (
-                    <div key={orderId} className="bg-white rounded-lg shadow-md overflow-hidden">
-                      {/* Header do Pedido */}
-                      <div className="p-6 border-b border-gray-200">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h2 className="text-xl font-bold">Pedido #{orderId}</h2>
-                            <p className="text-gray-600 text-sm">
-                              Feito em {new Date(order.data_pedido).toLocaleDateString('pt-BR')}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-                              {getStatusIcon(order.status)}
-                              {getStatusText(order.status)}
-                            </div>
-                          </div>
-                        </div>
-
-                        {order.trackingNumber && (
-                          <div className="bg-gray-50 p-3 rounded-lg">
-                            <p className="text-sm text-gray-600">Código de Rastreamento:</p>
-                            <p className="font-mono font-semibold">{order.trackingNumber}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Items do Pedido */}
-                      <div className="p-6 border-b border-gray-200">
-                        <h3 className="font-semibold mb-4">Produtos</h3>
-                        <div className="space-y-3">
-                          {(order.items || []).map((item, idx) => (
-                            <div key={idx} className="flex justify-between items-center">
-                              <div>
-                                <p className="font-semibold">{item.name}</p>
-                                <p className="text-sm text-gray-600">Quantidade: {item.quantity}</p>
-                              </div>
-                              <p className="font-semibold">Mts {toNumber(item.price).toFixed(2)}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Footer do Pedido */}
-                      <div className="p-6 bg-gray-50 flex justify-between items-center">
+            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <Package size={48} className="mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-600 text-lg">Você não fez nenhum pedido ainda.</p>
+              <Link to="/" className="text-blue-600 hover:text-blue-800 font-semibold mt-4 inline-block">
+                Continuar Comprando
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {orders.map(order => {
+                const orderId = order.id || order._id;
+                return (
+                  <div key={orderId} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    {/* Header do Pedido */}
+                    <div className="p-6 border-b border-gray-200">
+                      <div className="flex justify-between items-start mb-4">
                         <div>
-                          <p className="text-gray-600">Total do Pedido</p>
-                          <p className="text-2xl font-bold">Mts {toNumber(order.total).toFixed(2)}</p>
+                          <h2 className="text-xl font-bold">Pedido #{orderId}</h2>
+                          <p className="text-gray-600 text-sm">
+                            Feito em {new Date(order.data_pedido).toLocaleDateString('pt-BR')}
+                          </p>
                         </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDownloadPDF(order)}
-                            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
-                          >
-                            <FileText size={18} />
-                            Ver Nota
-                          </button>
-                          {order.status === 'enviado' && (
-                            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                              <Truck size={18} />
-                              Rastrear
-                            </button>
-                          )}
-                          {order.status === 'entregue' && (
-                            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                              <FileText size={18} />
-                              Comprar Novamente
-                            </button>
-                          )}
+                        <div className="text-right">
+                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                            {getStatusIcon(order.status)}
+                            {getStatusText(order.status)}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Timeline de Status */}
-                      <div className="p-6 bg-white">
-                        <h3 className="font-semibold mb-4">Histórico</h3>
-                        <div className="space-y-3 text-sm">
-                          {order.status === 'entregue' && (
-                            <>
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                                <span className="text-gray-600">Entregue em 18/01/2024</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                                <span className="text-gray-600">Saiu para entrega em 17/01/2024</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                                <span className="text-gray-600">Pedido processado em 15/01/2024</span>
-                              </div>
-                            </>
-                          )}
-                          {order.status === 'enviado' && (
-                            <>
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                                <span className="text-gray-600">Saiu para entrega</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                                <span className="text-gray-600">Pedido processado</span>
-                              </div>
-                            </>
-                          )}
-                          {order.status === 'processando' && (
-                            <>
-                              <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-yellow-600 rounded-full"></div>
-                                <span className="text-gray-600">Processando pedido</span>
-                              </div>
-                            </>
-                          )}
+                      {order.trackingNumber && (
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <p className="text-sm text-gray-600">Código de Rastreamento:</p>
+                          <p className="font-mono font-semibold">{order.trackingNumber}</p>
                         </div>
+                      )}
+                    </div>
+
+                    {/* Items do Pedido */}
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="font-semibold mb-4">Produtos</h3>
+                      <div className="space-y-3">
+                        {(order.items || []).map((item, idx) => (
+                          <div key={idx} className="flex justify-between items-center">
+                            <div>
+                              <p className="font-semibold">{item.name}</p>
+                              <p className="text-sm text-gray-600">Quantidade: {item.quantity}</p>
+                            </div>
+                            <p className="font-semibold">Mts {toNumber(item.price).toFixed(2)}</p>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    );
-                  })}
-                </div>
-              )
-            }
-          
-          </div>
+
+                    {/* Footer do Pedido */}
+                    <div className="p-6 bg-gray-50 flex justify-between items-center">
+                      <div>
+                        <p className="text-gray-600">Total do Pedido</p>
+                        <p className="text-2xl font-bold">Mts {toNumber(order.total).toFixed(2)}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDownloadPDF(order)}
+                          className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                        >
+                          <FileText size={18} />
+                          Ver Nota
+                        </button>
+                        {order.status === 'enviado' && (
+                          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <Truck size={18} />
+                            Rastrear
+                          </button>
+                        )}
+                        {order.status === 'entregue' && (
+                          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <FileText size={18} />
+                            Comprar Novamente
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Timeline de Status */}
+                    <div className="p-6 bg-white">
+                      <h3 className="font-semibold mb-4">Histórico</h3>
+                      <div className="space-y-3 text-sm">
+                        {order.status === 'entregue' && (
+                          <>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                              <span className="text-gray-600">Entregue em 18/01/2024</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                              <span className="text-gray-600">Saiu para entrega em 17/01/2024</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                              <span className="text-gray-600">Pedido processado em 15/01/2024</span>
+                            </div>
+                          </>
+                        )}
+                        {order.status === 'enviado' && (
+                          <>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                              <span className="text-gray-600">Saiu para entrega</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                              <span className="text-gray-600">Pedido processado</span>
+                            </div>
+                          </>
+                        )}
+                        {order.status === 'processando' && (
+                          <>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-yellow-600 rounded-full"></div>
+                              <span className="text-gray-600">Processando pedido</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+          }
+
+        </div>
       </div>
       <Footer />
     </div>

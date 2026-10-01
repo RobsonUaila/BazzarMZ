@@ -1,6 +1,36 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Outfit", sans-serif;
+  --font-display: "Syne", sans-serif;
+  
+  --color-primary: #121212;
+  --color-secondary: #F4F1EC;
+  --color-accent: #FF3B30;
+  --color-text-light: #666666;
+}
 
+@layer base {
+  body {
+    @apply bg-secondary text-primary font-sans antialiased selection:bg-accent selection:text-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
 
-
-
+/* Custom Utilities for the Premium Aesthetic */
+@layer utilities {
+  .editorial-shadow {
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+  }
+  
+  .magnetic-hover {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .magnetic-hover:hover {
+    transform: scale(1.05) rotate(-2deg);
+  }
+}
