@@ -181,17 +181,17 @@ function ProductList() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mb-16">
               {products.map((product, index) => (
                 <article
                   key={product.id}
                   className="group cursor-pointer"
                   onClick={() => navigate(`/produto/${product.id}`)}
                 >
-                  <div className="relative overflow-hidden bg-primary/5 h-[350px] md:h-[400px] mb-4">
+                  <div className="relative overflow-hidden bg-primary/5 h-[280px] md:h-[320px] mb-3">
                     {/* Badge */}
                     {product.estoque < 5 && product.estoque > 0 && (
-                      <div className="absolute top-4 left-[-1rem] bg-accent text-secondary font-display font-bold uppercase tracking-widest py-1.5 px-5 text-[10px] z-10 shadow-lg">
+                      <div className="absolute top-3 left-[-1rem] bg-accent text-secondary font-display font-bold uppercase tracking-widest py-1 px-4 text-[9px] z-10 shadow-lg">
                         Restam {product.estoque}
                       </div>
                     )}
@@ -207,23 +207,23 @@ function ProductList() {
                     {/* Favorite Button */}
                     <button 
                       onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
-                      className="absolute top-4 right-4 text-primary hover:text-accent transition-colors z-10 bg-secondary/80 p-2.5 rounded-full backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-sm"
+                      className="absolute top-3 right-3 text-primary hover:text-accent transition-colors z-10 bg-secondary/90 p-2 rounded-full backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-sm"
                     >
-                      <Heart size={18} strokeWidth={2.5} className={favorites.includes(product.id) ? 'fill-accent text-accent' : ''} />
+                      <Heart size={16} strokeWidth={2.5} className={favorites.includes(product.id) ? 'fill-accent text-accent' : ''} />
                     </button>
                   </div>
                   
                   {/* Content */}
-                  <div className="flex justify-between items-start gap-4 px-1">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-widest text-primary/50 mb-1">{product.categoria || 'Sem categoria'}</div>
-                      <h4 className="font-display font-bold text-xl md:text-2xl text-primary uppercase tracking-tight group-hover:text-accent transition-colors line-clamp-2">
+                  <div className="flex justify-between items-start gap-3 px-1">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-primary/50 mb-1 truncate">{product.categoria || 'Sem categoria'}</div>
+                      <h4 className="font-display font-bold text-lg md:text-xl text-primary uppercase tracking-tight group-hover:text-accent transition-colors line-clamp-2 leading-tight">
                         {product.nome}
                       </h4>
                     </div>
-                    <div className="text-right shrink-0">
-                      <div className="font-display font-bold text-xl md:text-2xl text-primary whitespace-nowrap">
-                        {parseFloat(product.preco).toFixed(0)} <span className="text-xs">MTS</span>
+                    <div className="text-right shrink-0 pl-2">
+                      <div className="font-display font-bold text-lg md:text-xl text-primary whitespace-nowrap">
+                        {parseFloat(product.preco).toFixed(0)} <span className="text-[10px]">MTS</span>
                       </div>
                     </div>
                   </div>
