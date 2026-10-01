@@ -177,11 +177,11 @@ const AdminUsers = () => {
                           value={user.role}
                           onChange={(e) => handleRoleChange(user.id, e.target.value)}
                           className={`p-2 border-none rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            user.role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            user.role === 'admin' ? 'bg-green-100 text-green-800' : user.role === 'partner' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                           }`}
                         >
                           <option value="user">Usuário</option>
-                          <option value="admin">Admin</option>
+                          <option value="partner">Parceiro</option><option value="admin">Admin</option>
                         </select>
                       </td>
                       <td className="p-4 flex justify-center gap-2">

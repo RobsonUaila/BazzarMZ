@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, User, Heart, ShoppingCart, LogOut } from 'lucide-react';
+import { Menu, X, Search, User, Heart, ShoppingCart, LogOut, LayoutDashboard } from 'lucide-react';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -79,9 +79,16 @@ function Navbar() {
               </Link>
 
               {user ? (
-                <Link to="/profile" className="text-gray-500 hover:text-blue-600 transition-colors" title={user.nome}>
-                  <User size={20} />
-                </Link>
+                <>
+                  {(user.role === 'admin' || user.role === 'partner') && (
+                    <Link to={user.role === 'admin' ? "/admin/dashboard" : "/partner/dashboard"} className="text-gray-500 hover:text-blue-600 transition-colors" title="Dashboard">
+                      <LayoutDashboard size={20} />
+                    </Link>
+                  )}
+                  <Link to="/profile" className="text-gray-500 hover:text-blue-600 transition-colors" title={user.nome}>
+                    <User size={20} />
+                  </Link>
+                </>
               ) : (
                 <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                   Entrar
@@ -149,6 +156,11 @@ function Navbar() {
             <div className="border-t border-gray-100 pt-4 mt-2 space-y-4">
               {user ? (
                 <>
+                  {(user.role === 'admin' || user.role === 'partner') && (
+                    <Link to={user.role === 'admin' ? "/admin/dashboard" : "/partner/dashboard"} className="flex items-center text-gray-700 hover:text-blue-600">
+                      <LayoutDashboard size={20} className="mr-3" /> Dashboard
+                    </Link>
+                  )}
                   <Link to="/profile" className="flex items-center text-gray-700 hover:text-blue-600">
                     <User size={20} className="mr-3" /> Meu Perfil
                   </Link>

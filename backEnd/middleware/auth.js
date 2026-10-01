@@ -1,4 +1,4 @@
-﻿const jwt = require ('jsonwebtoken');
+const jwt = require ('jsonwebtoken');
 const JwtSecret = process.env.JWT_SECRET;
 
 const auth = (req, res, next) =>{
@@ -12,11 +12,11 @@ const auth = (req, res, next) =>{
 
     jwt.verify(token, JwtSecret, (err, decoded)=>{
         if(err){
-            return res.status(401).json({ message: 'Token invÃ¡lido ou expirado', error: err.message });
+            return res.status(401).json({ message: 'Token inválido ou expirado', error: err.message });
         }
         
         if(!decoded){
-            return res.status(401).json({message:'Token invÃ¡lido'});
+            return res.status(401).json({message:'Token inválido'});
         }
         
         req.usuario = decoded;
@@ -26,7 +26,7 @@ const auth = (req, res, next) =>{
 };
 
 
-// Middleware opcional: se houver token, valida; se nÃ£o houver, segue como convidado
+// Middleware opcional: se houver token, valida; se não houver, segue como convidado
 const optionalAuth = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) return next();
@@ -36,22 +36,22 @@ const optionalAuth = (req, res, next) => {
 
     jwt.verify(token, JwtSecret, (err, decoded)=> {
         if (err || !decoded) {
-            return res.status(401).json({ message: 'Token invÃ¡lido ou expirado' });
+            return res.status(401).json({ message: 'Token inválido ou expirado' });
         }
         req.usuario = decoded;
         req.user = decoded;
         next();
     });
 };
-// Middleware para verificar role/autorizaÃ§Ã£o
-const authorize = (role) => {
+// Middleware para verificar role/autorização
+const authorize = (...roles) => {
     return (req, res, next) => {
         if (!req.usuario) {
-            return res.status(401).json({ message: 'NÃ£o autenticado' });
+            return res.status(401).json({ message: 'Não autenticado' });
         }
         
-        if (req.usuario.role !== role) {
-            return res.status(403).json({ message: `Acesso negado. Requer role: ${role}` });
+        if (!roles.includes(req.usuario.role)) {
+            return res.status(403).json({ message: `Acesso negado. Requer role: ${roles.join(", ")}` });
         }
         
         next();

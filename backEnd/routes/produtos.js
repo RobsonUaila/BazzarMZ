@@ -33,7 +33,7 @@ const uploadFields = upload.fields([
     { name: 'gifs', maxCount: 5 }
 ]);
 
-// Middleware para tratar erros do Multer de forma mais clara
+// Middleware para tratar erros do Multer
 const handleUploadErrors = (req, res, next) => {
     uploadFields(req, res, (err) => {
         if (err) {
@@ -41,10 +41,8 @@ const handleUploadErrors = (req, res, next) => {
                 if (err.code === 'LIMIT_FILE_SIZE') {
                     return next(new ErrorResponse(`Ficheiro demasiado grande. O limite é de ${FILE_SIZE_LIMIT_MB}MB.`, 400));
                 }
-                // Outros erros do Multer (ex: LIMIT_UNEXPECTED_FILE)
                 return next(new ErrorResponse(`Erro de upload: ${err.message}`, 400));
             }
-            // Erros do Cloudinary ou outros erros desconhecidos
             console.error('❌ Erro durante o upload (não-Multer):', err);
             return next(new ErrorResponse(err.message || 'Ocorreu um erro inesperado durante o upload.', 500));
         }
@@ -52,7 +50,7 @@ const handleUploadErrors = (req, res, next) => {
     });
 };
 
-// Middleware para upload direto para o Cloudinary (substitui multer-storage-cloudinary)
+// Middleware para upload direto para o Cloudinary
 const uploadToCloudinary = async (req, res, next) => {
     if (!req.files || Object.keys(req.files).length === 0) return next();
 
@@ -65,7 +63,7 @@ const uploadToCloudinary = async (req, res, next) => {
                 },
                 (error, result) => {
                     if (result) {
-                        file.path = result.secure_url; // Atualiza o objeto file com a URL segura
+                        file.path = result.secure_url;
                         resolve(result);
                     } else {
                         reject(error);
@@ -92,10 +90,9 @@ const uploadToCloudinary = async (req, res, next) => {
     }
 };
 
-// POST - Criar novo produto (admin)
-router.post('/', auth, authorize('admin'), handleUploadErrors, uploadToCloudinary, (req, res, next) => {
+// POST - Criar novo produto (admin, partner)
+router.post('/', auth, authorize('admin', 'partner'), handleUploadErrors, uploadToCloudinary, (req, res, next) => {
     try {
-        // 1. Validação Rigorosa (Não confiar no frontend)
         const schema = Joi.object({
             nome: Joi.string().required().messages({'any.required': 'O nome é obrigatório'}),
             descricao: Joi.string().allow('', null),
@@ -107,21 +104,16 @@ router.post('/', auth, authorize('admin'), handleUploadErrors, uploadToCloudinar
         const { error, value } = schema.validate(req.body);
 
         if (error) {
-            // Nota: Com Cloudinary, as imagens já foram enviadas. 
-            // Para deletar em caso de erro de validação, seria necessário chamar cloudinary.uploader.destroy
             return next(new ErrorResponse(`Dados inválidos: ${error.details[0].message}`, 400));
         }
 
         const { nome, descricao, preco, categoria, estoque } = value;
 
-        // Com Cloudinary, usamos .path (que contém a URL completa) em vez de .filename
         const imagemCapa = req.files?.imagem_capa?.[0]?.path || null;
         const thumbnail = req.files?.thumbnail?.[0]?.path || req.files?.imagem?.[0]?.path || null;
 
-        // Processar GIFs se existirem
         let finalDescricao = descricao;
         if (req.files?.gifs && req.files.gifs.length > 0) {
-            // Adiciona as tags de imagem dos GIFs ao final da descrição
             const gifTags = req.files.gifs.map(file => 
                 `<br /><br /><img src="${file.path}" alt="GIF do produto" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;" />`
             ).join('');
@@ -129,13 +121,13 @@ router.post('/', auth, authorize('admin'), handleUploadErrors, uploadToCloudinar
         }
 
         const sql = `
-            INSERT INTO produtos (nome, descricao, preco, categoria, estoque, imagem_capa, thumbnail, criado_em)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+            INSERT INTO produtos (nome, descricao, preco, categoria, estoque, imagem_capa, thumbnail, vendedor_id, criado_em)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
         `;
 
-        pool.query(sql, [nome, finalDescricao, preco, categoria, estoque || 0, imagemCapa, thumbnail], (err, results) => {
+        pool.query(sql, [nome, finalDescricao, preco, categoria, estoque || 0, imagemCapa, thumbnail, req.user.id], (err, results) => {
             if (err) {
-                console.error('❌ Erro SQL ao criar produto:', err); // Log detalhado do erro
+                console.error('❌ Erro SQL ao criar produto:', err);
                 return next(new ErrorResponse(`Erro ao criar produto: ${err.message}`, 500));
             }
             res.status(201).json({
@@ -157,6 +149,7 @@ router.get('/', (req, res, next) => {
         const offset = (page - 1) * limit;
         const categoria = req.query.categoria;
         const search = req.query.search;
+        const vendedor_id = req.query.vendedor_id; // Novo filtro para parceiros
 
         let sql = 'SELECT * FROM produtos WHERE 1=1';
         const params = [];
@@ -170,11 +163,13 @@ router.get('/', (req, res, next) => {
             sql += ' AND (nome LIKE ? OR descricao LIKE ?)';
             params.push(`%${search}%`, `%${search}%`);
         }
+        
+        if (vendedor_id) {
+            sql += ' AND vendedor_id = ?';
+            params.push(vendedor_id);
+        }
 
-        // Ordenar para que os produtos mais recentes apareçam primeiro
-        sql += ' ORDER BY criado_em DESC';
-
-        sql += ' LIMIT ? OFFSET ?';
+        sql += ' ORDER BY criado_em DESC LIMIT ? OFFSET ?';
         params.push(limit, offset);
 
         pool.query(sql, params, (err, produtos) => {
@@ -182,7 +177,6 @@ router.get('/', (req, res, next) => {
                 return next(new ErrorResponse(`Erro ao buscar produtos: ${err.message}`, 500));
             }
 
-            // Contar total de produtos para paginação
             let countSql = 'SELECT COUNT(*) as total FROM produtos WHERE 1=1';
             const countParams = [];
 
@@ -194,6 +188,11 @@ router.get('/', (req, res, next) => {
             if (search) {
                 countSql += ' AND (nome LIKE ? OR descricao LIKE ?)';
                 countParams.push(`%${search}%`, `%${search}%`);
+            }
+            
+            if (vendedor_id) {
+                countSql += ' AND vendedor_id = ?';
+                countParams.push(vendedor_id);
             }
 
             pool.query(countSql, countParams, (err, count) => {
@@ -239,8 +238,8 @@ router.get('/:id', (req, res, next) => {
     }
 });
 
-// PUT - Atualizar produto (admin)
-router.put('/:id', auth, authorize('admin'), handleUploadErrors, uploadToCloudinary, (req, res, next) => {
+// PUT - Atualizar produto (admin, partner)
+router.put('/:id', auth, authorize('admin', 'partner'), handleUploadErrors, uploadToCloudinary, (req, res, next) => {
     try {
         const { nome, descricao, preco, categoria, estoque } = req.body;
 
@@ -262,13 +261,19 @@ router.put('/:id', auth, authorize('admin'), handleUploadErrors, uploadToCloudin
 
         sql += ' WHERE id=?';
         params.push(req.params.id);
+        
+        // Se for partner, sÃ³ pode atualizar os prÃ³prios produtos
+        if (req.user.role === 'partner') {
+            sql += ' AND vendedor_id=?';
+            params.push(req.user.id);
+        }
 
         pool.query(sql, params, (err, results) => {
             if (err) {
                 return next(new ErrorResponse(`Erro ao atualizar produto: ${err.message}`, 500));
             }
             if (results.affectedRows === 0) {
-                return next(new ErrorResponse('Produto não encontrado', 404));
+                return next(new ErrorResponse('Produto não encontrado ou acesso negado', 404));
             }
             res.json({
                 success: true,
@@ -280,41 +285,44 @@ router.put('/:id', auth, authorize('admin'), handleUploadErrors, uploadToCloudin
     }
 });
 
-// DELETE - Deletar produto (admin)
-router.delete('/:id', auth, authorize('admin'), (req, res, next) => {
+// DELETE - Deletar produto (admin, partner)
+router.delete('/:id', auth, authorize('admin', 'partner'), (req, res, next) => {
     const produtoId = req.params.id;
+    const userId = req.user.id;
+    const isPartner = req.user.role === 'partner';
 
-    // 1. Remover dependências (Reviews e Wishlist) antes de apagar o produto
-    const deleteReviews = 'DELETE FROM reviews WHERE produto_id = ?';
-    const deleteWishlist = 'DELETE FROM wishlist WHERE produto_id = ?';
-    const deleteProduto = 'DELETE FROM produtos WHERE id = ?';
-
-    pool.query(deleteReviews, [produtoId], (err) => {
-        if (err) {
-            console.error("❌ Erro DB (Delete Reviews):", err);
-            return next(new ErrorResponse(`Erro ao apagar reviews: ${err.message}`, 500));
+    // Primeiro verificar se o produto pertence ao parceiro (se for parceiro)
+    const checkSql = 'SELECT vendedor_id FROM produtos WHERE id = ?';
+    pool.query(checkSql, [produtoId], (err, results) => {
+        if (err) return next(new ErrorResponse(`Erro ao verificar produto: ${err.message}`, 500));
+        if (results.length === 0) return next(new ErrorResponse('Produto não encontrado', 404));
+        
+        if (isPartner && results[0].vendedor_id !== userId) {
+            return next(new ErrorResponse('Acesso negado: Você só pode deletar os seus próprios produtos', 403));
         }
 
-        pool.query(deleteWishlist, [produtoId], (err) => {
-            if (err) {
-                console.error("❌ Erro DB (Delete Wishlist):", err);
-                return next(new ErrorResponse(`Erro ao apagar wishlist: ${err.message}`, 500));
-            }
+        // Remover dependências (Reviews e Wishlist) antes de apagar o produto
+        const deleteReviews = 'DELETE FROM reviews WHERE produto_id = ?';
+        const deleteWishlist = 'DELETE FROM wishlist WHERE produto_id = ?';
+        const deleteProduto = 'DELETE FROM produtos WHERE id = ?';
 
-            pool.query(deleteProduto, [produtoId], (err, results) => {
-                if (err) {
-                    console.error("❌ Erro DB (Delete Produto):", err);
-                    if (err.code === 'ER_ROW_IS_REFERENCED_2') {
-                        return next(new ErrorResponse('Não é possível apagar este produto pois ele faz parte de pedidos realizados.', 400));
+        pool.query(deleteReviews, [produtoId], (err) => {
+            if (err) return next(new ErrorResponse(`Erro ao apagar reviews: ${err.message}`, 500));
+
+            pool.query(deleteWishlist, [produtoId], (err) => {
+                if (err) return next(new ErrorResponse(`Erro ao apagar wishlist: ${err.message}`, 500));
+
+                pool.query(deleteProduto, [produtoId], (err, results) => {
+                    if (err) {
+                        if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+                            return next(new ErrorResponse('Não é possível apagar este produto pois ele faz parte de pedidos realizados.', 400));
+                        }
+                        return next(new ErrorResponse(`Erro ao deletar produto: ${err.message}`, 500));
                     }
-                    return next(new ErrorResponse(`Erro ao deletar produto: ${err.message}`, 500));
-                }
-                if (results.affectedRows === 0) {
-                    return next(new ErrorResponse('Produto não encontrado', 404));
-                }
-                res.json({
-                    success: true,
-                    message: 'Produto deletado com sucesso'
+                    res.json({
+                        success: true,
+                        message: 'Produto deletado com sucesso'
+                    });
                 });
             });
         });

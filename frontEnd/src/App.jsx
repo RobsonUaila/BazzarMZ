@@ -26,6 +26,7 @@ const Register = lazy(() => import('./pages/Register'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const ProductRegistration = lazy(() => import('./pages/ProductRegistration'));
 const Profile = lazy(() => import('./pages/Profile'));
+const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const Orders = lazy(() => import('./pages/Orders'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
@@ -92,6 +93,7 @@ function AppContent() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/partner/dashboard" element={<AnimatedRoute><PartnerDashboard /></AnimatedRoute>} />
             <Route path="/product-registration" element={<ProductRegistration />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path='/product-edit/:id' element={<AnimatedRoute><ProductRegistration /></AnimatedRoute>}/>
