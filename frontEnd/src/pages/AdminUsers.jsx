@@ -13,7 +13,10 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${apiUrl}/api/usuarios`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${apiUrl}/api/usuarios`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (response.data.success) {
         setUsers(response.data.data);
       } else {
@@ -49,7 +52,10 @@ const AdminUsers = () => {
     setUsers(updatedUsers);
 
     try {
-      const response = await axios.put(`${apiUrl}/api/usuarios/${userId}/role`, { role: newRole }, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`${apiUrl}/api/usuarios/${userId}/role`, { role: newRole }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (response.data.success) {
         toastSuccess('Cargo do usuário atualizado!');
       } else {
@@ -64,7 +70,10 @@ const AdminUsers = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Tem certeza que deseja apagar este usuário? Esta ação é irreversível.')) {
       try {
-        const response = await axios.delete(`${apiUrl}/api/usuarios/${userId}`, { withCredentials: true });
+        const token = localStorage.getItem('token');
+        const response = await axios.delete(`${apiUrl}/api/usuarios/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         if (response.data.success) {
           toastSuccess('Usuário apagado com sucesso!');
           setUsers(users.filter(u => u.id !== userId));
@@ -79,7 +88,10 @@ const AdminUsers = () => {
   
   const handleLogout = async () => {
     try {
-        await axios.get(`${apiUrl}/api/usuarios/logout`, { withCredentials: true });
+        const token = localStorage.getItem('token');
+        await axios.get(`${apiUrl}/api/usuarios/logout`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
     } catch (error) {
         console.error("Erro ao fazer logout no servidor, procedendo com limpeza local.", error);
     } finally {

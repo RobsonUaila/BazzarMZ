@@ -1,22 +1,19 @@
 const mysql = require('mysql2');
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
-// Forçar apenas o banco 'ecommerce'
-const dbName = 'ecommerce';
-
-console.log(`🔌 Conectando ao banco: ${dbName}`);
+console.log(`🔌 Conectando ao banco: ${process.env.DB_DATABASE}`);
 console.log(`   Host: ${process.env.DB_HOST}`);
-console.log(`   User: ${process.env.DB_USER}`);
+console.log(`   User: ${process.env.DB_USERNAME}`);
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
-    user: process.env.DB_USER,
+    user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    database: dbName,  // Forçado para 'ecommerce'
-    port: process.env.DB_PORT || 3306,
+    database: process.env.DB_DATABASE,
+    port: process.env.DB_PORT,
     ssl: {
         minVersion: 'TLSv1.2',
-        rejectUnauthorized: false
+        rejectUnauthorized: true
     },
     waitForConnections: true,
     connectionLimit: 10,

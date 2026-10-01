@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Star } from 'lucide-react';
 
 function Intro() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ function Intro() {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   const getImageUrl = (path) => {
-    if (!path) return 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
+    if (!path) return 'https://via.placeholder.com/300?text=Sem+Imagem';
     if (path.startsWith('http') || path.startsWith('data:')) return path;
     return `${apiUrl}/uploads/images/${path}`;
   };
@@ -22,7 +22,7 @@ function Intro() {
         if (!response.ok) throw new Error('Erro ao carregar produtos');
         const data = await response.json();
         const productList = data.data || data.produtos || (Array.isArray(data) ? data : []);
-        setProducts(productList.slice(0, 4)); // Only show 4 for the editorial grid
+        setProducts(productList.slice(0, 4));
       } catch (error) {
         console.error(error);
       } finally {
@@ -35,11 +35,11 @@ function Intro() {
 
   if (loading) {
     return (
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-24">
-        <div className="h-12 bg-primary/10 rounded w-1/4 mb-16 animate-pulse"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="h-8 bg-gray-200 rounded w-1/3 mb-8 animate-pulse"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-primary/5 h-[500px] animate-pulse"></div>
+            <div key={i} className="bg-gray-200 rounded-lg h-80 animate-pulse"></div>
           ))}
         </div>
       </div>
@@ -47,76 +47,64 @@ function Intro() {
   }
 
   return (
-    <section className="bg-secondary py-32 border-b border-primary/20">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        
-        <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
-          <div>
-            <h4 className="text-accent text-sm font-bold uppercase tracking-[0.2em] mb-4">Curadoria</h4>
-            <h3 className="text-2xl md:text-5xl font-display font-extrabold uppercase tracking-tighter text-primary">
-              Destaques <br/> <span className="text-transparent" style={{ WebkitTextStroke: '1px #121212' }}>Da Estação</span>
-            </h3>
-          </div>
-          <Link to="/produtos" className="group flex items-center gap-3 font-display font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors pb-2 border-b-2 border-primary hover:border-accent">
-            Ver Todos O Catálogo
-            <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
+    <div className="bg-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">Produtos em Destaque</h2>
+          <Link to="/produtos" className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+            Ver Todos <span className="ml-1">&rarr;</span>
           </Link>
         </div>
 
         {products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {products.map((product, index) => (
-              <article
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <div
                 key={product.id}
-                className={`group cursor-pointer ${index % 2 === 1 ? 'lg:mt-12' : ''}`}
+                className="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow group cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => navigate(`/produto/${product.id}`)}
               >
-                <div className="relative overflow-hidden bg-primary/5 h-[300px] md:h-[350px] mb-3">
-                  {/* Badge */}
-                  <div className="absolute top-3 left-[-1rem] bg-accent text-secondary font-display font-bold uppercase tracking-widest py-1 px-4 text-[9px] z-10 shadow-lg">
-                    {index === 0 ? 'N° 1' : `N° ${index + 1}`}
-                  </div>
-                  
-                  {/* Image */}
+                <div className="relative h-56 overflow-hidden bg-gray-100">
                   <img
                     src={getImageUrl(product.imagem_capa || product.imagem)}
                     alt={product.nome}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 group-hover:-rotate-1 grayscale hover:grayscale-0"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop'; }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300?text=Sem+Imagem'; }}
                   />
-
-                  {/* Favorite Button */}
-                  <button className="absolute top-3 right-3 text-primary hover:text-accent transition-colors z-10 bg-secondary/90 p-2 rounded-full backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-sm">
-                    <Heart size={16} strokeWidth={2.5} />
+                  <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-gray-50 text-gray-400 hover:text-red-500 transition-colors">
+                    <Heart size={18} />
                   </button>
                 </div>
                 
-                {/* Content */}
-                <div className="flex justify-between items-start gap-3 px-1">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-primary/50 mb-1 truncate">Categoria</div>
-                    <h4 className="font-display font-bold text-lg md:text-xl text-primary uppercase tracking-tight group-hover:text-accent transition-colors line-clamp-2 leading-tight">
-                      {product.nome}
-                    </h4>
-                  </div>
-                  <div className="text-right shrink-0 pl-2">
-                    <div className="font-display font-bold text-lg md:text-xl text-primary whitespace-nowrap">
-                      {parseFloat(product.preco).toFixed(0)} <span className="text-[10px]">MTS</span>
+                <div className="p-4 flex flex-col flex-grow">
+                  <span className="text-xs text-blue-600 font-medium mb-1">{product.categoria || 'Geral'}</span>
+                  <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">{product.nome}</h3>
+                  
+                  <div className="flex items-center mb-3">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={14} className={i < 4 ? 'fill-current' : 'text-gray-300'} />
+                      ))}
                     </div>
+                    <span className="text-xs text-gray-500 ml-1">(4.0)</span>
+                  </div>
+                  
+                  <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
+                    <span className="text-lg font-bold text-gray-900">
+                      MT {parseFloat(product.preco).toFixed(2)}
+                    </span>
                   </div>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-24 border border-primary/10">
-            <p className="font-display text-2xl text-primary/50 uppercase tracking-widest">O Catálogo está a ser atualizado.</p>
+          <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg">
+            <p>Nenhum produto em destaque no momento.</p>
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
