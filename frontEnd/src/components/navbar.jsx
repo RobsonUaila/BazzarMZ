@@ -88,6 +88,9 @@ function Navbar() {
                   <Link to="/profile" className="text-gray-500 hover:text-blue-600 transition-colors" title={user.nome}>
                     <User size={20} />
                   </Link>
+                  <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 transition-colors" title="Sair">
+                    <LogOut size={20} />
+                  </button>
                 </>
               ) : (
                 <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium text-sm">

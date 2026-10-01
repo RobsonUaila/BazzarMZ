@@ -35,7 +35,7 @@ function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link to="/" className="hover:text-white transition-colors">Início</Link></li>
               <li><Link to="/produtos" className="hover:text-white transition-colors">Todos os Produtos</Link></li>
-              <li><Link to="/login" className="hover:text-white transition-colors">Minha Conta</Link></li>
+              <li><Link to="/profile" className="hover:text-white transition-colors">Minha Conta</Link></li>
             </ul>
           </div>
 

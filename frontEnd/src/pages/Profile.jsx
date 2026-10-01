@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Edit2, Save, X, ShoppingBag, Heart } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Edit2, Save, X, ShoppingBag, Heart, LayoutDashboard } from 'lucide-react';
 import Navbar from '../components/navbar';
 import Footer from '../components/footer';
 import { toastError, toastSuccess } from '../utils/toast';
@@ -325,7 +325,7 @@ function Profile() {
           </div>
 
           {/* Seção de Outras Opções */}
-          <div className="grid md:grid-cols-3 gap-4 mt-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center gap-3 mb-4">
                 <ShoppingBag className="text-blue-600" size={24} />
