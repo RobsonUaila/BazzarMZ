@@ -177,7 +177,7 @@ router.put('/:id/role', auth, authorize('admin'), asyncHandler(async (req, res, 
     const { role } = req.body;
     const { id } = req.params;
 
-    if (!role || !['admin', 'user'].includes(role)) {
+    if (!role || !['admin', 'user', 'partner'].includes(role)) {
         return next(new ErrorResponse('Cargo invÃ¡lido', 400));
     }
 
