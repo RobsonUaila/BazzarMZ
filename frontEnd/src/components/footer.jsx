@@ -18,10 +18,10 @@ function Footer() {
         
         {/* Massive Typography Section */}
         <div className="mb-20 text-center md:text-left relative">
-          <h2 className="text-[12vw] leading-none font-display font-extrabold uppercase tracking-tighter opacity-10 select-none absolute -top-16 left-0">
+          <h2 className="text-[3vw] leading-none font-display font-extrabold uppercase tracking-tighter opacity-10 select-none absolute -top-16 left-0">
             QUICK
           </h2>
-          <h2 className="text-5xl md:text-8xl font-display font-extrabold uppercase tracking-tighter relative z-10">
+          <h2 className="text-2xl md:text-3xl font-display font-extrabold uppercase tracking-tighter relative z-10">
             Mantenha-se <br /> <span className="text-accent">À Frente.</span>
           </h2>
         </div>

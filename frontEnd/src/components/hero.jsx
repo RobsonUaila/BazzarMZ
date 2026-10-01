@@ -11,21 +11,21 @@ function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         
         {/* Text Content */}
-        <div className="flex flex-col justify-center py-16">
-          <div className="text-accent text-sm font-bold uppercase tracking-[0.2em] mb-4">
+        <div className="flex flex-col justify-center py-10 md:py-16 text-center md:text-left">
+          <div className="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.2em] mb-4">
             Nova Coleção Verão 2026
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-display font-extrabold leading-[0.85] tracking-tighter uppercase mb-8 text-primary">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display font-extrabold leading-[0.85] tracking-tighter uppercase mb-6 md:mb-8 text-primary">
             Aura <br/>
             <span className="text-transparent" style={{ WebkitTextStroke: '2px #121212' }}>Bruta.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-text-light font-sans font-light mb-12 max-w-lg leading-relaxed">
+          <p className="text-lg md:text-2xl text-text-light font-sans font-light mb-8 md:mb-12 max-w-lg leading-relaxed mx-auto md:mx-0">
             Redefina o conceito de estilo com peças que não pedem desculpas. Minimalismo com atitude.
           </p>
           
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-center md:justify-start">
             <Link to="/produtos" className="group relative inline-flex items-center justify-center px-10 py-5 bg-accent text-white font-display font-bold uppercase tracking-wider overflow-hidden">
               <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-primary rounded-full group-hover:w-full group-hover:h-56"></span>
               <span className="relative flex items-center gap-3">

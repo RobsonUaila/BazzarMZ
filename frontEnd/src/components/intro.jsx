@@ -53,7 +53,7 @@ function Intro() {
         <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
           <div>
             <h4 className="text-accent text-sm font-bold uppercase tracking-[0.2em] mb-4">Curadoria</h4>
-            <h3 className="text-5xl md:text-7xl font-display font-extrabold uppercase tracking-tighter text-primary">
+            <h3 className="text-2xl md:text-5xl font-display font-extrabold uppercase tracking-tighter text-primary">
               Destaques <br/> <span className="text-transparent" style={{ WebkitTextStroke: '1px #121212' }}>Da Estação</span>
             </h3>
           </div>
@@ -66,16 +66,16 @@ function Intro() {
         </div>
 
         {products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
             {products.map((product, index) => (
               <article
                 key={product.id}
-                className={`group cursor-pointer ${index % 2 === 1 ? 'md:mt-32' : ''}`}
+                className={`group cursor-pointer ${index % 2 === 1 ? 'md:mt-16' : ''}`}
                 onClick={() => navigate(`/produto/${product.id}`)}
               >
-                <div className="relative overflow-hidden bg-primary/5 aspect-[4/5] mb-6">
+                <div className="relative overflow-hidden bg-primary/5 h-[350px] md:h-[450px] mb-4">
                   {/* Badge */}
-                  <div className="absolute top-6 left-[-1rem] bg-accent text-secondary font-display font-bold uppercase tracking-widest py-2 px-6 text-xs z-10 shadow-lg">
+                  <div className="absolute top-4 left-[-1rem] bg-accent text-secondary font-display font-bold uppercase tracking-widest py-1.5 px-5 text-[10px] z-10 shadow-lg">
                     {index === 0 ? 'N° 1' : `N° ${index + 1}`}
                   </div>
                   
@@ -88,22 +88,22 @@ function Intro() {
                   />
 
                   {/* Favorite Button */}
-                  <button className="absolute top-6 right-6 text-primary hover:text-accent transition-colors z-10 bg-secondary/80 p-3 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100">
-                    <Heart size={20} strokeWidth={2.5} />
+                  <button className="absolute top-4 right-4 text-primary hover:text-accent transition-colors z-10 bg-secondary/80 p-2.5 rounded-full backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-sm">
+                    <Heart size={18} strokeWidth={2.5} />
                   </button>
                 </div>
                 
                 {/* Content */}
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex justify-between items-start gap-4 px-1">
                   <div>
-                    <div className="text-sm font-bold uppercase tracking-widest text-primary/50 mb-2">Categoria</div>
-                    <h4 className="font-display font-bold text-3xl text-primary uppercase tracking-tight group-hover:text-accent transition-colors">
+                    <div className="text-xs font-bold uppercase tracking-widest text-primary/50 mb-1">Categoria</div>
+                    <h4 className="font-display font-bold text-xl md:text-2xl text-primary uppercase tracking-tight group-hover:text-accent transition-colors">
                       {product.nome}
                     </h4>
                   </div>
                   <div className="text-right">
-                    <div className="font-display font-bold text-2xl text-primary whitespace-nowrap">
-                      {parseFloat(product.preco).toFixed(0)} <span className="text-sm">MTS</span>
+                    <div className="font-display font-bold text-xl md:text-2xl text-primary whitespace-nowrap">
+                      {parseFloat(product.preco).toFixed(0)} <span className="text-xs">MTS</span>
                     </div>
                   </div>
                 </div>
