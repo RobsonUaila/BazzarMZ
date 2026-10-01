@@ -106,36 +106,36 @@ function ProductList() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-secondary text-primary">
       <Navbar />
 
-      <div className="grow container mx-auto px-4 py-12">
+      <div className="grow max-w-[1400px] mx-auto w-full px-6 lg:px-12 py-16">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Nossos Produtos</h1>
-          <p className="text-gray-600">Explore nossa coleção de produtos de qualidade</p>
+        <div className="mb-12 border-b border-primary/20 pb-8">
+          <h1 className="text-4xl md:text-6xl font-display font-extrabold uppercase tracking-tighter mb-4 text-primary">Catálogo</h1>
+          <p className="text-primary/60 font-sans uppercase tracking-widest text-sm">Explore nossa curadoria de produtos exclusivos</p>
         </div>
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-primary/5 p-6 mb-16 border border-primary/10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">
                 Buscar
               </label>
               <input
                 type="text"
-                placeholder="Digite o nome do produto..."
+                placeholder="PROCURAR..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-secondary border border-primary/20 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent font-sans rounded-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">
                 Categoria
               </label>
               <select
@@ -144,14 +144,14 @@ function ProductList() {
                   setCategory(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-secondary border border-primary/20 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent font-sans rounded-none appearance-none uppercase text-sm tracking-wider"
               >
                 <option value="">Todas as categorias</option>
                 <option value="Vestuário">Vestuário</option>
                 <option value="Casa">Casa</option>
                 <option value="Acessórios">Acessórios</option>
                 <option value="Higiene e Limpeza">Higiene e Limpeza</option>
-                <option value="Cosmeticos">Cosmeticos</option>
+                <option value="Cosmeticos">Cosméticos</option>
                 <option value="Diversos">Diversos</option>
               </select>
             </div>
@@ -162,7 +162,7 @@ function ProductList() {
                   setCategory('');
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition"
+                className="w-full px-4 py-3 bg-primary text-secondary hover:bg-accent font-display font-bold uppercase tracking-widest rounded-none transition-colors"
               >
                 Limpar Filtros
               </button>
@@ -181,78 +181,63 @@ function ProductList() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-              {products.map(product => (
-                <div
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-16">
+              {products.map((product, index) => (
+                <article
                   key={product.id}
+                  className="group cursor-pointer"
                   onClick={() => navigate(`/produto/${product.id}`)}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition group"
                 >
-                  {/* Imagem */}
-                  <Link to={`/produto/${product.id}`}>
-                    <div className="relative h-48 bg-gray-100 overflow-hidden cursor-pointer">
-                      <img
-                        src={getImageUrl(product.imagem_capa || product.imagem)}
-                        alt={product.nome}
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                      />
-                      {product.estoque < 5 && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                          Restam {product.estoque}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
+                  <div className="relative overflow-hidden bg-primary/5 h-[350px] md:h-[400px] mb-4">
+                    {/* Badge */}
+                    {product.estoque < 5 && product.estoque > 0 && (
+                      <div className="absolute top-4 left-[-1rem] bg-accent text-secondary font-display font-bold uppercase tracking-widest py-1.5 px-5 text-[10px] z-10 shadow-lg">
+                        Restam {product.estoque}
+                      </div>
+                    )}
+                    
+                    {/* Image */}
+                    <img
+                      src={getImageUrl(product.imagem_capa || product.imagem)}
+                      alt={product.nome}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 group-hover:-rotate-1 grayscale hover:grayscale-0"
+                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop'; }}
+                    />
 
-                  <div className="p-4">
-                    {/* Categoria */}
-                    <span className="inline-block text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded mb-2">
-                      {product.categoria || 'Sem categoria'}
-                    </span>
-
-                    {/* Nome */}
-                    <Link
-                      to={`/produto/${product.id}`}
-                      className="block font-semibold text-gray-900 mb-2 hover:text-blue-600 transition line-clamp-2"
+                    {/* Favorite Button */}
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}
+                      className="absolute top-4 right-4 text-primary hover:text-accent transition-colors z-10 bg-secondary/80 p-2.5 rounded-full backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 shadow-sm"
                     >
-                      {product.nome}
-                    </Link>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={14}
-                          className={i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
-                        />
-                      ))}
-                      <span className="text-xs text-gray-500">4.5</span>
+                      <Heart size={18} strokeWidth={2.5} className={favorites.includes(product.id) ? 'fill-accent text-accent' : ''} />
+                    </button>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex justify-between items-start gap-4 px-1">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-primary/50 mb-1">{product.categoria || 'Sem categoria'}</div>
+                      <h4 className="font-display font-bold text-xl md:text-2xl text-primary uppercase tracking-tight group-hover:text-accent transition-colors line-clamp-2">
+                        {product.nome}
+                      </h4>
                     </div>
-
-                    {/* Preço */}
-                    <div className="mb-4">
-                      <span className="text-xl font-bold text-green-600">
-                        MT{parseFloat(product.preco).toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Chamada para Ação Visual */}
-                    <div className="mt-4 text-sm text-blue-600 font-medium group-hover:underline">
-                      Ver detalhes e comprar &rarr;
+                    <div className="text-right shrink-0">
+                      <div className="font-display font-bold text-xl md:text-2xl text-primary whitespace-nowrap">
+                        {parseFloat(product.preco).toFixed(0)} <span className="text-xs">MTS</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
 
             {/* Paginação */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 mb-8">
+              <div className="flex items-center justify-center gap-2 mb-12">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-3 bg-secondary border border-primary/20 text-primary hover:bg-primary hover:text-secondary disabled:opacity-30 disabled:hover:bg-secondary disabled:hover:text-primary transition-colors rounded-none"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -262,9 +247,9 @@ function ProductList() {
                     <button
                       key={i + 1}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`px-4 py-2 rounded-lg font-semibold transition ${currentPage === i + 1
-                        ? 'bg-blue-600 text-white'
-                        : 'border border-gray-300 hover:bg-gray-100'
+                      className={`px-5 py-3 font-display font-bold text-lg transition-colors rounded-none ${currentPage === i + 1
+                        ? 'bg-primary text-secondary border border-primary'
+                        : 'bg-secondary border border-primary/20 text-primary hover:bg-primary hover:text-secondary'
                         }`}
                     >
                       {i + 1}
@@ -275,7 +260,7 @@ function ProductList() {
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-3 bg-secondary border border-primary/20 text-primary hover:bg-primary hover:text-secondary disabled:opacity-30 disabled:hover:bg-secondary disabled:hover:text-primary transition-colors rounded-none"
                 >
                   <ChevronRight size={20} />
                 </button>
